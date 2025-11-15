@@ -135,11 +135,11 @@ async function testSandboxWithServer() {
     console.log('   3. Vite dev server hot-reloads automatically');
     console.log('   4. Changes are visible in real-time via this URL\n');
 
-    console.log('⏱️  Sandbox will stay alive for 120 seconds...');
+    console.log('⏱️  Sandbox will stay alive for 30 minutes...');
     console.log('   Press Ctrl+C to exit early\n');
     
-    // Keep alive
-    await new Promise(resolve => setTimeout(resolve, 120000));
+    // Keep alive for 30 minutes (1800 seconds)
+    await new Promise(resolve => setTimeout(resolve, 30 * 60 * 1000));
 
   } catch (error: any) {
     console.error('❌ Error:', error.message);

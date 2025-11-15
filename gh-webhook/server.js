@@ -22,7 +22,7 @@ app.use(express.json({
 
 const WEBHOOK_SECRET = process.env.GH_WEBHOOK_SECRET; // same value you set in GitHub
 const GH_TOKEN = process.env.GH_TOKEN;                 // optional: to fetch PR comments
-const SANDBOX_URL = process.env.SANDBOX_URL || "https://your-sandbox.example.com/deploy";
+const SANDBOX_URL = process.env.SANDBOX_URL || "http://localhost:8000/experiment/from-webhook";
 
 function verifySig(req) {
   // If no webhook secret is set, skip verification (for development/testing)
@@ -85,23 +85,30 @@ app.post("/github-webhook", async (req, res) => {
       console.warn("Failed to fetch CodeRabbit comments/reviews:", e.message);
     }
 
-    // 3) Trigger your sandbox
+    // 3) Trigger DevRel flow via API
     const payload = {
       repo: p.repository.full_name,
       pr: number,
       title,
-      summary: summary || "(no summary found on PR body or CodeRabbit comments)"
+      summary: body,
+      coderabbitSummary: summary || "(no coderabbit summary found)",
     };
 
-    console.log("Posting to sandbox:", payload);
+    console.log("📤 Posting to API:", JSON.stringify(payload, null, 2));
 
-    const resp = await fetch(SANDBOX_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    try {
+      const resp = await fetch(SANDBOX_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-    console.log("Sandbox response status:", resp.status);
+      console.log("📊 API response status:", resp.status);
+      const responseText = await resp.text();
+      console.log("📄 API response:", responseText);
+    } catch (err) {
+      console.error("❌ Error posting to API:", err.message);
+    }
   }
 
   res.send("ok");

@@ -1,16 +1,16 @@
 import { ExperimentEntity, experimentsTable } from '@/db/experiment.db';
-import { AgentEntity, agentsTable } from '@/db/agent.db';
 import { inngestClient } from '@/lib/inngest-client';
 import { ExperimentService } from '@/service/experiment/Experiment.service';
 import { AiService } from '@/service/ai/Ai.service';
 import { BrowserService } from '@/service/browser/Browser.service';
 import { db } from '@/lib/client';
-import { generateId, Id } from '@/lib/id';
 import { eq } from 'drizzle-orm';
-import { variantsTable } from '@/db/variant.db';
 
 export interface ExperimentRunJobData {
   experiment: ExperimentEntity;
+  prTitle?: string;
+  prSummary?: string;
+  coderabbitSummary?: string;
 }
 
 const EXPERIMENT_RUN_JOB_ID = 'run-experiment';
@@ -19,7 +19,7 @@ export const runExperimentJob = inngestClient.createFunction(
   { id: EXPERIMENT_RUN_JOB_ID },
   { event: 'experiment/run' },
   async ({ event, step }) => {
-    const { experiment } = event.data as ExperimentRunJobData;
+    const { experiment, prTitle, prSummary, coderabbitSummary } = event.data as ExperimentRunJobData;
 
     //  init repository
     const sandboxResult = await step.run('init-repo', async () => {
@@ -33,199 +33,117 @@ export const runExperimentJob = inngestClient.createFunction(
       );
     });
 
-    // we now have the repo running on the sandbox.previewUrl with the control variant ready
-    // now we need to spawn a browser agent to test visit the control variant with a goal so we have its logs
-    const agentResult = await step.run(
+    console.log(`✅ Repository initialized. Dev server running at: ${sandboxResult.variant.publicUrl}`);
+
+    // Spawn browser agent to test and capture screenshots
+    const browserAgentResult = await step.run(
       'spawn-browser-agent',
-      async (): Promise<{
-        agentId: string;
-        taskId: string;
-        liveUrl: string | null;
-      }> => {
+      async () => {
         console.log(
-          `Spawning browser agent for variant ${sandboxResult.variant.id}`
+          `🌐 Spawning browser agent to test new features`
         );
 
-        // Step 1: Generate the browser task prompt using AI
+        // Generate a task based on the PR summary
         const taskPrompt = await AiService.generateBrowserTaskPrompt(
-          experiment.goal,
+          prSummary || experiment.goal,
           sandboxResult.variant.publicUrl
         );
-        console.log(`Generated task prompt: ${taskPrompt}`);
+        console.log(`📝 Generated task prompt: ${taskPrompt}`);
 
-        // Step 2: Create the agent entity in database
-        const agent: AgentEntity = {
-          id: generateId('agent'),
-          createdAt: new Date().toISOString(),
-          experimentId: experiment.id,
-          variantId: sandboxResult.variant.id,
-          browserTaskId: '', // Will be updated after task creation
-          browserLiveUrl: null,
-          taskPrompt,
-          status: 'pending',
-          result: null,
-          rawLogs: null,
-        };
-
-        await db.insert(agentsTable).values(agent);
-        console.log(`Created agent entity: ${agent.id}`);
-
-        // Step 3: Create browser automation task
+        // Create and run browser task
         const browserTask = await BrowserService.createTask(
           taskPrompt,
           sandboxResult.variant.publicUrl
         );
-        console.log(
-          `Created browser task: ${browserTask.id}, Live URL: not-here`
-        );
-
-        // Update agent with browser task info
-        await db
-          .update(agentsTable)
-          .set({
-            browserTaskId: browserTask.id,
-            browserLiveUrl: '',
-            status: 'running',
-          })
-          .where(eq(agentsTable.id, agent.id));
+        console.log(`📹 Browser task created: ${browserTask.id}`);
 
         return {
-          agentId: agent.id,
           taskId: browserTask.id,
-          liveUrl: '',
         };
       }
     );
 
-    // Step 4: Wait for browser task to complete and analyze results
-    const analysisResult = await step.run('analyze-browser-results', async () => {
-      console.log(`Waiting for browser task ${agentResult.taskId} to complete`);
+    // Wait for browser task to complete and collect screenshots
+    const screenshotsResult = await step.run('collect-screenshots', async () => {
+      console.log(`⏳ Waiting for browser task to complete...`);
 
-      // Wait for task completion (max 5 minutes)
+      // Wait for task completion
       const completedTask = await BrowserService.waitForTaskCompletion(
-        agentResult.taskId,
+        browserAgentResult.taskId,
         5 * 60 * 1000
       );
-      console.log(
-        `Browser task completed with status: ${completedTask.status}`
-      );
+      console.log(`✅ Browser task completed with status: ${completedTask.status}`);
 
-      // Get task logs
-      const rawLogs = await BrowserService.getTaskLogs(agentResult.taskId);
-      console.log(`Retrieved task logs (${rawLogs.length} characters)`);
+      // Get task steps which include screenshots
+      const taskSteps = await BrowserService.getTaskSteps(browserAgentResult.taskId);
+      console.log(`📸 Collected ${taskSteps.length} steps with screenshots`);
 
-      // Analyze logs using AI
-      const analysis = await AiService.analyzeBrowserLogs(
-        rawLogs,
-        experiment.goal
-      );
-      console.log(`Analysis: ${JSON.stringify(analysis, null, 2)}`);
+      // Extract screenshot URLs from steps
+      const screenshots = taskSteps
+        .filter((step: any) => step.screenshot)
+        .map((step: any) => ({
+          url: step.screenshot,
+          description: step.summary || 'Feature demonstration',
+        }));
 
-      // Determine final status
-      const finalStatus: 'completed' | 'failed' =
-        completedTask.status === 'finished' ? 'completed' : 'failed';
-
-      // Update agent with results
-      await db
-        .update(agentsTable)
-        .set({
-          status: finalStatus,
-          result: analysis,
-          rawLogs,
-        })
-        .where(eq(agentsTable.id, agentResult.agentId as Id<'agent'>));
-
-      console.log(`Agent ${agentResult.agentId} updated with results`);
-
-      // update the variant with the analyis
-      await db
-        .update(variantsTable)
-        .set({
-          analysis: analysis,
-        })
-        .where(eq(variantsTable.id, sandboxResult.variant.id));
+      console.log(`🖼️  Found ${screenshots.length} screenshots`);
 
       return {
-        agentId: agentResult.agentId,
-        analysis,
+        taskId: browserAgentResult.taskId,
+        screenshots,
+        taskSteps,
       };
     });
 
-    // Step 5: Generate variant suggestions based on control test results
-    const variantSuggestions = await step.run(
-      'generate-variant-suggestions',
-      async () => {
-        console.log(
-          'Generating variant suggestions based on control test analysis'
-        );
+    // Generate social media post
+    const postResult = await step.run('generate-social-post', async () => {
+      console.log(`📝 Generating social media post...`);
 
-        // Generate UX improvement suggestions using AI
-        const suggestions = await AiService.generateExperimentVariants(
-          {
-            success: analysisResult.analysis.success,
-            summary: analysisResult.analysis.summary,
-            insights: analysisResult.analysis.insights,
-          },
-          experiment.goal
-        );
+      const post = await AiService.generateSocialMediaPost({
+        title: prTitle || 'New Feature Release',
+        summary: coderabbitSummary || prSummary || experiment.goal,
+        screenshots: screenshotsResult.screenshots,
+      });
 
-        console.log(
-          `Generated ${suggestions.length} variant suggestions: ${JSON.stringify(suggestions, null, 2)}`
-        );
+      console.log(`✅ Social media post generated`);
+      console.log(`Post content:\n${post.content}\n`);
 
-        // Store the suggestions in the experiment
-        await db
-          .update(experimentsTable)
-          .set({
-            variantSuggestions: suggestions,
-          })
-          .where(eq(experimentsTable.id, experiment.id));
-
-        console.log(
-          `Stored variant suggestions for experiment ${experiment.id}`
-        );
-
-        return suggestions;
-      }
-    );
-
-    console.log(
-      `Experiment ${experiment.id} completed control test. Generated ${variantSuggestions.length} variant suggestions to test.`
-    );
-
-    // Step 6: Trigger variant implementation for each suggestion
-    await step.run('trigger-variant-implementations', async () => {
-      console.log(
-        `Triggering ${variantSuggestions.length} variant implementations`
-      );
-
-      // Trigger a separate job for each variant implementation
-      // These will run in parallel, each in its own sandbox
-      for (const suggestion of variantSuggestions) {
-        await inngestClient.send({
-          name: 'variant/implement',
-          data: {
-            experimentId: experiment.id,
-            suggestion,
-            repoUrl: experiment.repoUrl,
-            goal: experiment.goal,
-          },
-        });
-
-        console.log(`Triggered variant implementation: ${suggestion}`);
-      }
-
-      console.log(
-        `All ${variantSuggestions.length} variant implementations triggered`
-      );
+      return {
+        post,
+        screenshots: screenshotsResult.screenshots,
+      };
     });
 
-    // The experiment job is complete
-    // Each variant implementation will:
-    // 1. Create a new sandbox
-    // 2. Spawn Claude Code to implement the suggestion
-    // 3. Start dev server
-    // 4. Be ready for browser agent testing
+    // Update experiment with results
+    await step.run('save-results', async () => {
+      await db
+        .update(experimentsTable)
+        .set({
+          status: 'completed',
+          variantSuggestions: [postResult.post.content], // Store the generated post
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(experimentsTable.id, experiment.id));
+
+      console.log(`✅ Experiment ${experiment.id} completed`);
+    });
+
+    console.log(`
+🎉 DEVREL FLOW COMPLETE!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Sandbox: ${sandboxResult.variant.daytonaSandboxId}
+✅ Live URL: ${sandboxResult.variant.publicUrl}
+✅ Screenshots: ${screenshotsResult.screenshots.length}
+✅ Social Post Generated
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    `);
+
+    return {
+      experimentId: experiment.id,
+      sandboxId: sandboxResult.variant.daytonaSandboxId,
+      screenshots: postResult.screenshots,
+      socialPost: postResult.post,
+    };
   }
 );
 

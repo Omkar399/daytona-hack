@@ -170,4 +170,71 @@ Return ONLY valid JSON, no markdown formatting or additional text.`,
       .replace(/```\n?/g, '');
     return JSON.parse(cleaned);
   }
+
+  /**
+   * Generate a social media post about new features with screenshots
+   * @param params - Object containing title, summary, and screenshots
+   * @returns Generated social media post with hashtags and call-to-action
+   */
+  static async generateSocialMediaPost(params: {
+    title: string;
+    summary: string;
+    screenshots: Array<{ url: string; description: string }>;
+  }): Promise<{
+    content: string;
+    hashtags: string[];
+    platform: 'twitter' | 'linkedin' | 'all';
+  }> {
+    const screenshotDescriptions = params.screenshots
+      .map((s, i) => `Screenshot ${i + 1}: ${s.description}`)
+      .join('\n');
+
+    const { text } = await generateText({
+      model,
+      prompt: `You are creating an engaging social media post announcing new features for an e-commerce/developer tool.
+
+Feature Title: ${params.title}
+Feature Summary: ${params.summary}
+Screenshots Available: ${params.screenshots.length} screenshots showing:
+${screenshotDescriptions}
+
+Create an engaging social media post that:
+1. Highlights the main value/benefit of this feature
+2. Creates excitement and encourages engagement
+3. Is suitable for both Twitter/X and LinkedIn (we'll adapt based on platform)
+4. Includes clear, relevant hashtags
+5. Has a call-to-action (try it now, check it out, etc.)
+6. Is concise but descriptive (under 280 characters for Twitter version, can be longer for LinkedIn)
+
+For Twitter/X (max 280 chars): Create a punchy, exciting tweet
+For LinkedIn (no char limit): Create a more detailed, professional post
+For "all": Create a version that works on both platforms
+
+Tone: Enthusiastic, professional, friendly - like you're excited to share something cool.
+
+Return response as JSON with this structure:
+{
+  "twitter": "...",
+  "linkedin": "...",
+  "hashtags": ["tag1", "tag2", "tag3", ...],
+  "callToAction": "..."
+}
+
+Return ONLY valid JSON, no markdown formatting.`,
+    });
+
+    const cleaned = text
+      .trim()
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '');
+    
+    const parsed = JSON.parse(cleaned);
+    
+    // Return a combined version suitable for general use
+    return {
+      content: `${parsed.linkedin}\n\n${parsed.hashtags.join(' ')}`,
+      hashtags: parsed.hashtags,
+      platform: 'all',
+    };
+  }
 }

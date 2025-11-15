@@ -6,6 +6,7 @@ import { desc, eq } from 'drizzle-orm';
 import Elysia, { t } from 'elysia';
 import { inngestClient } from '@/lib/inngest-client';
 import { VariantEntity, variantsTable } from '@/db/variant.db';
+import { createExperimentJob, ExperimentRunJobData } from './Experiment.jobs';
 
 export const experimentRoutes = new Elysia({ prefix: '/experiment' })
   .get('/', () => {
@@ -47,11 +48,8 @@ export const experimentRoutes = new Elysia({ prefix: '/experiment' })
 
       await db.insert(experimentsTable).values(newExperiment);
 
-      // kick off workflow for expermintation
-      await inngestClient.send({
-        name: 'experiment/run',
-        data: { experiment: newExperiment },
-      });
+      // kick off workflow for experimentation
+      await createExperimentJob({ experiment: newExperiment });
 
       return newExperiment;
     },
@@ -59,6 +57,55 @@ export const experimentRoutes = new Elysia({ prefix: '/experiment' })
       body: t.Object({
         repoUrl: t.String(),
         goal: t.String(),
+      }),
+    }
+  )
+  .post(
+    '/from-webhook',
+    async ({ body }) => {
+      console.log('🔔 Received GitHub webhook for PR merge');
+      console.log(`   PR: ${body.pr}`);
+      console.log(`   Title: ${body.title}`);
+      console.log(`   Repo: ${body.repo}`);
+
+      // Create new experiment from PR data
+      const newExperiment: ExperimentEntity = {
+        id: generateId('experiment'),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        repoUrl: `https://github.com/${body.repo}`,
+        goal: body.title, // Use PR title as the goal
+        status: 'pending',
+        variantSuggestions: [],
+      };
+
+      await db.insert(experimentsTable).values(newExperiment);
+      console.log(`✅ Created experiment: ${newExperiment.id}`);
+
+      // Trigger the DevRel flow with PR metadata
+      const jobData: ExperimentRunJobData = {
+        experiment: newExperiment,
+        prTitle: body.title,
+        prSummary: body.summary,
+        coderabbitSummary: body.coderabbitSummary,
+      };
+
+      await createExperimentJob(jobData);
+      console.log(`✅ Triggered DevRel flow for PR #${body.pr}`);
+
+      return {
+        success: true,
+        experimentId: newExperiment.id,
+        message: `DevRel flow started for PR #${body.pr}`,
+      };
+    },
+    {
+      body: t.Object({
+        repo: t.String(), // e.g., "Omkar399/hack_ecom"
+        pr: t.Number(), // PR number
+        title: t.String(), // PR title
+        summary: t.Optional(t.String()), // PR summary
+        coderabbitSummary: t.Optional(t.String()), // CodeRabbit summary
       }),
     }
   );
