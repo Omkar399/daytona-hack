@@ -31,7 +31,7 @@ async function testSandboxWithServer() {
     const WORK_DIR = 'workspace/commerce';  // Match ExperimentService.WORK_DIR
     console.log('📥 Cloning repository...');
     await sandbox.git.clone(
-      'https://github.com/RogutKuba/fake-ecommerce',
+      'https://github.com/Omkar399/hack_ecom',
       WORK_DIR  // Same as production: 'workspace/commerce'
     );
     console.log('✅ Repository cloned\n');
