@@ -10,6 +10,8 @@ interface Experiment {
   createdAt: string;
   updatedAt: string;
   variantSuggestions?: string[];
+  postApprovalStatus?: 'pending' | 'approved' | 'rejected' | 'posted';
+  postedToXAt?: string;
   controlVariant?: {
     id: string;
     daytonaSandboxId: string;
@@ -99,6 +101,33 @@ export const useStartExperimentMutation = () => {
 
   return {
     startExperiment: mutation.mutateAsync,
+    ...mutation,
+  };
+};
+
+// Approve/Reject post mutation
+export const useApprovePostMutation = () => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: ({ experimentId, approved }: { experimentId: string; approved: boolean }) => {
+      return API_CLIENT.fetch(`/experiment/${experimentId}/approve-post`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ approved }),
+      });
+    },
+    onSuccess: (data, variables) => {
+      // Invalidate both queries to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ['experiment', variables.experimentId] });
+      queryClient.invalidateQueries({ queryKey: ['experiments'] });
+    },
+  });
+
+  return {
+    approvePost: mutation.mutateAsync,
     ...mutation,
   };
 };

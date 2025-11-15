@@ -1,6 +1,6 @@
 'use client';
 
-import { useExperimentDetailQuery } from '@/query/experiment.query';
+import { useExperimentDetailQuery, useApprovePostMutation } from '@/query/experiment.query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,6 +21,25 @@ interface ExperimentDetailContainerProps {
 
 export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailContainerProps) => {
   const { experiment, isLoading, isError } = useExperimentDetailQuery(experimentId);
+  const { approvePost, isPending: isApproving } = useApprovePostMutation();
+
+  const handleApprove = async (expId: string) => {
+    try {
+      await approvePost({ experimentId: expId, approved: true });
+      console.log('✅ Post approved and posting to X initiated');
+    } catch (error) {
+      console.error('❌ Failed to approve post:', error);
+    }
+  };
+
+  const handleReject = async (expId: string) => {
+    try {
+      await approvePost({ experimentId: expId, approved: false });
+      console.log('✅ Post rejected');
+    } catch (error) {
+      console.error('❌ Failed to reject post:', error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -175,6 +194,11 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
                 postContent={experiment.variantSuggestions?.[0]}
                 hashtags={['#devrel', '#automation', '#featurelaunch']}
                 platform="all"
+                experimentId={experimentId}
+                postApprovalStatus={experiment.postApprovalStatus || 'pending'}
+                onApprove={handleApprove}
+                onReject={handleReject}
+                isApproving={isApproving}
               />
             </div>
           </div>

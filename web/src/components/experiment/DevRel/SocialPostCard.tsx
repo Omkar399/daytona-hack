@@ -1,9 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   RiShareForwardLine,
   RiCheckboxCircleLine,
   RiLoader4Line,
   RiFileCopyLine,
+  RiCheckLine,
+  RiCloseLine,
+  RiTwitterXLine,
 } from '@remixicon/react';
 import { useState } from 'react';
 
@@ -12,6 +16,11 @@ interface SocialPostCardProps {
   postContent?: string;
   hashtags?: string[];
   platform?: 'twitter' | 'linkedin' | 'all';
+  experimentId?: string;
+  postApprovalStatus?: 'pending' | 'approved' | 'rejected' | 'posted';
+  onApprove?: (experimentId: string) => void;
+  onReject?: (experimentId: string) => void;
+  isApproving?: boolean;
 }
 
 export const SocialPostCard = ({
@@ -19,6 +28,11 @@ export const SocialPostCard = ({
   postContent,
   hashtags = [],
   platform = 'all',
+  experimentId,
+  postApprovalStatus = 'pending',
+  onApprove,
+  onReject,
+  isApproving = false,
 }: SocialPostCardProps) => {
   const [copied, setCopied] = useState(false);
 
@@ -119,12 +133,67 @@ export const SocialPostCard = ({
               </div>
             )}
 
-            <div className="pt-2 bg-green-50 border border-green-200 rounded p-3">
-              <p className="text-xs text-green-700">
-                ✓ Post is ready to share! Copy the content above and post to your social media
-                channels.
-              </p>
-            </div>
+            {/* Approval Status */}
+            {postApprovalStatus === 'posted' && (
+              <div className="pt-2 bg-green-50 border border-green-200 rounded p-3">
+                <div className="flex items-center gap-2">
+                  <RiTwitterXLine size={16} className="text-green-600" />
+                  <p className="text-sm font-medium text-green-700">
+                    ✓ Successfully posted to X!
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {postApprovalStatus === 'approved' && (
+              <div className="pt-2 bg-blue-50 border border-blue-200 rounded p-3">
+                <div className="flex items-center gap-2">
+                  <RiLoader4Line size={16} className="text-blue-600 animate-spin" />
+                  <p className="text-sm font-medium text-blue-700">
+                    Posting to X...
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {postApprovalStatus === 'rejected' && (
+              <div className="pt-2 bg-red-50 border border-red-200 rounded p-3">
+                <p className="text-sm text-red-700">
+                  Post was rejected and will not be published
+                </p>
+              </div>
+            )}
+
+            {/* Approval Buttons - Only show if pending */}
+            {postApprovalStatus === 'pending' && experimentId && onApprove && onReject && (
+              <div className="pt-3 border-t space-y-2">
+                <p className="text-sm font-medium text-neutral-700">
+                  Ready to post to X?
+                </p>
+                <div className="flex gap-3">
+                  <Button
+                    onClick={() => onApprove(experimentId)}
+                    disabled={isApproving}
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    <RiCheckLine size={16} className="mr-2" />
+                    {isApproving ? 'Posting...' : 'Accept & Post to X'}
+                  </Button>
+                  <Button
+                    onClick={() => onReject(experimentId)}
+                    disabled={isApproving}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <RiCloseLine size={16} className="mr-2" />
+                    Reject
+                  </Button>
+                </div>
+                <p className="text-xs text-neutral-500 text-center">
+                  This will automatically post the content and screenshots to X
+                </p>
+              </div>
+            )}
           </div>
         )}
 
