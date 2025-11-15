@@ -31,9 +31,9 @@ export abstract class BrowserService {
     const pollInterval = 3000; // Poll every 3 seconds
 
     while (Date.now() - startTime < maxWaitTime) {
-      const task = await browserUse.tasks.getTask(taskId);
+      const task = await browserUse.tasks.getTask({ task_id: taskId });
 
-      if (task.status === 'finished' || task.status === 'stopped') {
+      if (task?.status === 'finished' || task?.status === 'stopped') {
         return task;
       }
 
@@ -50,8 +50,8 @@ export abstract class BrowserService {
    * @returns
    */
   static async getTaskSteps(taskId: string): Promise<TaskStepView[]> {
-    const task = await browserUse.tasks.getTask(taskId);
-    return task.steps;
+    const task = await browserUse.tasks.getTask({ task_id: taskId });
+    return task?.steps ?? [];
   }
 
   /**
@@ -60,7 +60,7 @@ export abstract class BrowserService {
    * @returns raw txt file with the full task logs and thinking process
    */
   static async getTaskLogs(taskId: string) {
-    const { downloadUrl } = await browserUse.tasks.getTaskLogs(taskId);
+    const { downloadUrl } = await browserUse.tasks.getTaskLogs({ task_id: taskId });
     const response = await fetch(downloadUrl);
     const text = await response.text();
     return text;

@@ -13,7 +13,7 @@
     "@daytonaio/sdk": "^0.111.0",
     "@elysiajs/cors": "^1.4.0",
     "ai": "^5.0.76",
-    "browser-use-sdk": "^2.0.4",
+    "browser-use-sdk": "^2.0.6",
     "drizzle-kit": "^0.31.5",
     "drizzle-orm": "^0.44.6",
     "elysia": "latest",
