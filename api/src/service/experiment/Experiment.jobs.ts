@@ -45,18 +45,30 @@ export const runExperimentJob = inngestClient.createFunction(
 
         // Extract specific features from CodeRabbit summary
         let features: string[] = [];
+        let testingSteps: string[] = [];
+        
         if (coderabbitSummary) {
+          // Step 1: Extract user-facing features
           features = await AiService.extractFeaturesFromSummary(coderabbitSummary);
-          console.log(`✨ Extracted features to test: ${features.join(', ')}`);
+          console.log(`✨ Extracted features to test:`);
+          features.forEach(f => console.log(`   - ${f}`));
+          
+          // Step 2: Generate step-by-step testing instructions
+          testingSteps = await AiService.generateTestingSteps(coderabbitSummary, features);
+          if (testingSteps.length > 0) {
+            console.log(`📋 Generated ${testingSteps.length} testing steps:`);
+            testingSteps.forEach((s, i) => console.log(`   ${i + 1}. ${s}`));
+          }
         }
 
-        // Generate a task based on the PR summary and extracted features
+        // Generate a task based on the PR summary, features, and testing steps
         const taskPrompt = await AiService.generateBrowserTaskPrompt(
           prSummary || experiment.goal,
           sandboxResult.variant.publicUrl,
-          features
+          features,
+          testingSteps
         );
-        console.log(`📝 Generated task prompt: ${taskPrompt}`);
+        console.log(`📝 Generated task prompt:\n${taskPrompt}\n`);
 
         // Create and run browser task
         const browserTask = await BrowserService.createTask(
@@ -67,6 +79,7 @@ export const runExperimentJob = inngestClient.createFunction(
 
         return {
           taskId: browserTask.id,
+          testingSteps,
         };
       }
     );

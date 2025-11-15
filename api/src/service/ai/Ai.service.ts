@@ -62,19 +62,85 @@ Return ONLY valid JSON array of strings, no markdown or additional text.`,
   }
 
   /**
+   * Convert technical CodeRabbit summary into step-by-step user testing instructions
+   * @param coderabbitSummary - Technical summary of code changes
+   * @param features - Extracted user-facing features
+   * @returns Step-by-step testing instructions for browser agent
+   */
+  static async generateTestingSteps(
+    coderabbitSummary: string,
+    features: string[]
+  ): Promise<string[]> {
+    if (features.length === 0) {
+      return [];
+    }
+
+    const { text } = await generateText({
+      model,
+      prompt: `You are a QA engineer creating step-by-step browser testing instructions.
+
+Technical Summary (from CodeRabbit):
+${coderabbitSummary}
+
+User-Facing Features:
+${features.map(f => `- ${f}`).join('\n')}
+
+Create a numbered list of specific, actionable testing steps that a browser automation agent should follow to test these features.
+
+Each step should be:
+1. Specific (exactly what to click/type/look for)
+2. User-facing (no technical jargon)
+3. Testable (observable outcome)
+4. Sequential (builds on previous steps)
+
+Example for "Added shopping cart filter":
+1. Navigate to the shopping page
+2. Locate the filter sidebar on the left side
+3. Click on a category filter (e.g., "Electronics")
+4. Verify products update to show only that category
+5. Try the price range slider
+6. Verify products filter by selected price range
+7. Click "Clear Filters" to reset
+
+Now create 5-8 testing steps for the features above.
+
+Return ONLY a JSON array of strings, each being one step:
+["Step 1 text", "Step 2 text", ...]`,
+    });
+
+    try {
+      const cleaned = text
+        .trim()
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '');
+      const steps = JSON.parse(cleaned);
+      return Array.isArray(steps) ? steps : [];
+    } catch (e) {
+      console.error('Failed to parse testing steps:', e);
+      return [];
+    }
+  }
+
+  /**
    * Generate a browser automation task prompt based on the user's goal
    * @param goal - The high-level goal the user wants to achieve (typically describes a problem/issue or features to test)
    * @param url - The URL where the task should be performed
    * @param features - Optional list of specific features to focus testing on
+   * @param testingSteps - Optional step-by-step testing instructions
    * @returns A natural, exploratory task prompt that simulates a real user
    */
   static async generateBrowserTaskPrompt(
     goal: string,
     url: string,
-    features?: string[]
+    features?: string[],
+    testingSteps?: string[]
   ): Promise<string> {
     const featureFocus = features && features.length > 0 
-      ? `\n\nImportant: Focus testing on these specific new features:\n${features.map(f => `- ${f}`).join('\n')}`
+      ? `\n\nFeatures to test:\n${features.map(f => `- ${f}`).join('\n')}`
+      : '';
+
+    const stepsFocus = testingSteps && testingSteps.length > 0
+      ? `\n\nStep-by-step testing instructions:\n${testingSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`
       : '';
 
     const { text } = await generateText({
@@ -85,17 +151,18 @@ The experiment goal describes a problem or issue with a website. Your job is to 
 
 Given:
 - Issue/Problem: ${goal}
-- Website URL: ${url}${featureFocus}
+- Website URL: ${url}${featureFocus}${stepsFocus}
 
 Create a natural browsing task that:
 1. Simulates how a real person would use the site
-2. Naturally leads to encountering the described issue
-3. Is exploratory and open-ended (not rigid step-by-step)
+2. ${testingSteps && testingSteps.length > 0 ? 'Follows the testing steps provided above while maintaining natural exploration' : 'Naturally leads to encountering the described issue'}
+3. Is exploratory but thorough (test all features mentioned)
 4. Focuses on the user's intent and experience
 5. Documents what they observe and experience
 
-DO NOT write rigid instructions like "click button X, then click button Y"
-DO write natural exploration like "browse the site looking for products, try to find ways to narrow down your search"
+${testingSteps && testingSteps.length > 0 
+  ? 'IMPORTANT: Use the step-by-step testing instructions provided above as a guide. Make the browser agent follow these steps naturally, as if a real user would.' 
+  : 'DO NOT write rigid instructions like "click button X, then click button Y"\nDO write natural exploration like "browse the site looking for products, try to find ways to narrow down your search"'}
 
 Examples:
 

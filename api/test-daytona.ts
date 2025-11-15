@@ -31,7 +31,7 @@ async function testSandboxWithServer() {
     const WORK_DIR = 'workspace/commerce';  // Match ExperimentService.WORK_DIR
     console.log('📥 Cloning repository...');
     await sandbox.git.clone(
-      'https://github.com/Omkar399/hack_ecom',
+      'https://github.com/Omkar399/events_app',
       WORK_DIR  // Same as production: 'workspace/commerce'
     );
     console.log('✅ Repository cloned\n');
@@ -113,20 +113,20 @@ async function testSandboxWithServer() {
     console.log('║               ✅ SANDBOX READY TO USE! ✅             ║');
     console.log('╠════════════════════════════════════════════════════════╣');
     console.log(`║ Sandbox ID: ${sandbox.id.substring(0, 38).padEnd(40)}║`);
-    console.log('║ Repository: fake-ecommerce                            ║');
+    console.log('║ Repository: events_app (fake-events)                  ║');
     console.log('║ Server: Dev server (PM2 managed)                       ║');
     console.log('║ Port: 3000 (matches production)                        ║');
     console.log('╠════════════════════════════════════════════════════════╣');
     console.log(`║ Preview URL:${' '.repeat(43)}║`);
     console.log(`║ ${previewLink.url.padEnd(54)}║`);
     console.log('╠════════════════════════════════════════════════════════╣');
-    console.log('║ ✓ Real Vite ecommerce app running                    ║');
+    console.log('║ ✓ Real Vite events app running                        ║');
     console.log('║ ✓ PM2 managing the process                            ║');
     console.log('║ ✓ Accessible from anywhere                            ║');
     console.log('║ ✓ This is EXACTLY how production works                ║');
     console.log('╚════════════════════════════════════════════════════════╝\n');
 
-    console.log('🔗 Visit this URL to see the ecommerce site:');
+    console.log('🔗 Visit this URL to see the events app:');
     console.log(`   ${previewLink.url}\n`);
 
     console.log('📚 What happens next:');
