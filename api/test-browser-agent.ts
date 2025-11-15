@@ -1,5 +1,6 @@
 import { BrowserService } from '@/service/browser/Browser.service';
 
+
 const SANDBOX_URL = 'https://3000-ef9cc422-c8e8-455b-b70b-6d5ae5287299.proxy.daytona.works';
 
 async function testBrowserAgent() {
