@@ -81,10 +81,16 @@ export const runExperimentJob = inngestClient.createFunction(
         5 * 60 * 1000
       );
       console.log(`✅ Browser task completed with status: ${completedTask.status}`);
+      console.log(`   Task result:`, JSON.stringify(completedTask, null, 2));
 
       // Get task steps which include screenshots
       const taskSteps = await BrowserService.getTaskSteps(browserAgentResult.taskId);
-      console.log(`📸 Collected ${taskSteps.length} steps with screenshots`);
+      console.log(`📸 Collected ${taskSteps.length} steps`);
+      
+      // Debug: log first few steps to see structure
+      if (taskSteps.length > 0) {
+        console.log(`   First step structure:`, JSON.stringify(taskSteps[0], null, 2));
+      }
 
       // Extract screenshot URLs from steps
       const screenshots = taskSteps
@@ -95,6 +101,10 @@ export const runExperimentJob = inngestClient.createFunction(
         }));
 
       console.log(`🖼️  Found ${screenshots.length} screenshots`);
+      
+      if (screenshots.length === 0 && taskSteps.length > 0) {
+        console.warn(`⚠️  No screenshots found but ${taskSteps.length} steps exist. Step keys:`, Object.keys(taskSteps[0]));
+      }
 
       return {
         taskId: browserAgentResult.taskId,
@@ -124,6 +134,7 @@ export const runExperimentJob = inngestClient.createFunction(
 
     // Update experiment with results
     await step.run('save-results', async () => {
+      // Update experiment status and save social post
       await db
         .update(experimentsTable)
         .set({
@@ -134,6 +145,32 @@ export const runExperimentJob = inngestClient.createFunction(
         .where(eq(experimentsTable.id, experiment.id));
 
       console.log(`✅ Experiment ${experiment.id} completed`);
+      
+      // Save screenshots as variants
+      console.log(`💾 Saving ${postResult.screenshots.length} screenshots to database...`);
+      
+      const { variantsTable } = await import('@/db/variant.db');
+      const { generateId } = await import('@/lib/id');
+      
+      for (const screenshot of postResult.screenshots) {
+        await db.insert(variantsTable).values({
+          id: generateId('variant'),
+          createdAt: new Date().toISOString(),
+          experimentId: experiment.id,
+          daytonaSandboxId: sandboxResult.variant.daytonaSandboxId,
+          publicUrl: sandboxResult.variant.publicUrl,
+          type: 'experiment',
+          suggestion: screenshot.url, // Store screenshot URL in suggestion field
+          analysis: {
+            success: true,
+            summary: screenshot.description,
+            insights: [],
+            issues: [],
+          },
+        });
+      }
+      
+      console.log(`✅ Saved ${postResult.screenshots.length} screenshots`);
     });
 
     console.log(`
