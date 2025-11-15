@@ -13,11 +13,11 @@ export interface ExperimentRunJobData {
   coderabbitSummary?: string;
 }
 
-const EXPERIMENT_RUN_JOB_ID = 'run-experiment';
+const EXPERIMENT_RUN_JOB_ID = 'experiment/run';
 
 export const runExperimentJob = inngestClient.createFunction(
-  { id: EXPERIMENT_RUN_JOB_ID },
-  { event: 'experiment/run' },
+  { id: 'run-experiment' },
+  { event: EXPERIMENT_RUN_JOB_ID },
   async ({ event, step }) => {
     const { experiment, prTitle, prSummary, coderabbitSummary } = event.data as ExperimentRunJobData;
 

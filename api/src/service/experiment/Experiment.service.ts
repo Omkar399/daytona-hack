@@ -18,6 +18,37 @@ export const experimentRoutes = new Elysia({ prefix: '/experiment' })
       .orderBy(desc(experimentsTable.createdAt))
       .limit(10);
   })
+  .delete(
+    '/:id',
+    async ({ params }) => {
+      const experimentId = params.id as Id<'experiment'>;
+      
+      // Delete variants first (foreign key constraint)
+      await db
+        .delete(variantsTable)
+        .where(eq(variantsTable.experimentId, experimentId));
+      
+      // Delete experiment
+      await db
+        .delete(experimentsTable)
+        .where(eq(experimentsTable.id, experimentId));
+      
+      return { success: true, message: 'Experiment deleted' };
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+    }
+  )
+  .delete('/all/clear', async () => {
+    // Delete all variants first
+    await db.delete(variantsTable);
+    // Delete all experiments
+    await db.delete(experimentsTable);
+    
+    return { success: true, message: 'All experiments cleared' };
+  })
   .get(
     '/:id',
     async ({ params }) => {
@@ -102,12 +133,30 @@ export const experimentRoutes = new Elysia({ prefix: '/experiment' })
       console.log(`   Title: ${body.title}`);
       console.log(`   Repo: ${body.repo}`);
 
+      // Check if experiment already exists for this PR
+      const repoUrl = `https://github.com/${body.repo}`;
+      const existingExperiments = await db
+        .select()
+        .from(experimentsTable)
+        .where(eq(experimentsTable.repoUrl, repoUrl))
+        .limit(1);
+
+      if (existingExperiments.length > 0 && existingExperiments[0].goal === body.title) {
+        console.log(`⚠️  Experiment already exists for this PR, skipping duplicate`);
+        return {
+          success: true,
+          experimentId: existingExperiments[0].id,
+          message: `Experiment already exists for PR #${body.pr} (duplicate webhook call)`,
+          duplicate: true,
+        };
+      }
+
       // Create new experiment from PR data
       const newExperiment: ExperimentEntity = {
         id: generateId('experiment'),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        repoUrl: `https://github.com/${body.repo}`,
+        repoUrl,
         goal: body.title, // Use PR title as the goal
         status: 'pending',
         variantSuggestions: [],
@@ -155,13 +204,39 @@ export abstract class ExperimentService {
     let end = Date.now();
 
     start = Date.now();
-    const sandbox = await daytona.create({
-      language: 'typescript',
-      public: true,
-      envVars: {
-        NODE_ENV: 'development',
-      },
-    });
+    
+    // Retry sandbox creation up to 3 times on timeout
+    let sandbox;
+    let retries = 3;
+    let lastError;
+    
+    for (let i = 0; i < retries; i++) {
+      try {
+        console.log(`Creating sandbox (attempt ${i + 1}/${retries})...`);
+        sandbox = await daytona.create({
+          language: 'typescript',
+          public: true,
+          envVars: {
+            NODE_ENV: 'development',
+          },
+        });
+        break; // Success! Exit retry loop
+      } catch (error) {
+        lastError = error;
+        console.error(`Sandbox creation attempt ${i + 1} failed:`, error.message);
+        
+        if (i < retries - 1) {
+          const waitTime = (i + 1) * 5000; // Wait 5s, 10s, 15s
+          console.log(`Retrying in ${waitTime / 1000} seconds...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+      }
+    }
+    
+    if (!sandbox) {
+      throw new Error(`Failed to create sandbox after ${retries} attempts. Last error: ${lastError?.message || 'Unknown'}`);
+    }
+    
     end = Date.now();
     console.log(`Time taken to create sandbox: ${end - start}ms`);
 
