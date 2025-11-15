@@ -191,6 +191,66 @@ export const experimentRoutes = new Elysia({ prefix: '/experiment' })
         coderabbitSummary: t.Optional(t.String()), // CodeRabbit summary
       }),
     }
+  )
+  .post(
+    '/:id/approve-post',
+    async ({ params, body }) => {
+      const experimentId = params.id as Id<'experiment'>;
+      const { approved } = body;
+
+      console.log(`📝 Post approval for experiment ${experimentId}: ${approved ? 'APPROVED' : 'REJECTED'}`);
+
+      // Get the experiment
+      const experiments = await db
+        .select()
+        .from(experimentsTable)
+        .where(eq(experimentsTable.id, experimentId))
+        .limit(1);
+
+      if (experiments.length === 0) {
+        return { success: false, message: 'Experiment not found' };
+      }
+
+      const experiment = experiments[0];
+
+      // Update approval status
+      const newStatus = approved ? 'approved' : 'rejected';
+      await db
+        .update(experimentsTable)
+        .set({
+          postApprovalStatus: newStatus,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(experimentsTable.id, experimentId));
+
+      // If approved, trigger the post-to-X job
+      if (approved) {
+        console.log(`✅ Post approved! Triggering post-to-X job...`);
+
+        const { postToXJob } = await import('./Experiment.jobs');
+        await postToXJob({ experimentId });
+
+        return {
+          success: true,
+          message: 'Post approved and posting to X initiated',
+          status: 'approved',
+        };
+      }
+
+      return {
+        success: true,
+        message: 'Post rejected',
+        status: 'rejected',
+      };
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      body: t.Object({
+        approved: t.Boolean(),
+      }),
+    }
   );
 
 export abstract class ExperimentService {
