@@ -5,15 +5,78 @@ const model = google('gemini-2.0-flash-lite');
 
 export abstract class AiService {
   /**
+   * Extract key features from a CodeRabbit summary to focus browser testing
+   * @param coderabbitSummary - The CodeRabbit PR analysis summary
+   * @returns List of new features/changes mentioned in the summary
+   */
+  static async extractFeaturesFromSummary(
+    coderabbitSummary: string
+  ): Promise<string[]> {
+    if (!coderabbitSummary || coderabbitSummary.length < 10) {
+      return [];
+    }
+
+    const { text } = await generateText({
+      model,
+      prompt: `You are analyzing a CodeRabbit PR summary to extract key features and changes that were made.
+
+CodeRabbit Summary:
+${coderabbitSummary}
+
+Extract the main NEW FEATURES, significant UI/UX CHANGES, or IMPROVEMENTS mentioned in this summary.
+
+Focus on identifying:
+1. New user-facing features (what users will see and interact with)
+2. Significant UI/UX changes (design updates, layout changes, new sections)
+3. Major behavioral improvements (new functionality, better workflows)
+4. User-impacting changes (not internal refactoring unless it improves UX)
+
+Return response as a JSON array of strings, where each string is one feature/change in simple terms a QA tester would use.
+
+Examples of GOOD feature descriptions:
+- "Warm color theme with orange and gold gradients"
+- "New checkout flow with single-page payment"
+- "Product search with real-time filtering"
+- "Shopping cart sidebar with quick view"
+- "Dark mode toggle in settings"
+
+Examples of BAD descriptions:
+- "Refactored components"
+- "Updated dependencies"
+- "Code cleanup"
+
+Return ONLY valid JSON array of strings, no markdown or additional text.`,
+    });
+
+    try {
+      const cleaned = text
+        .trim()
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '');
+      const features = JSON.parse(cleaned);
+      return Array.isArray(features) ? features : [];
+    } catch (e) {
+      console.error('Failed to parse features from summary:', e);
+      return [];
+    }
+  }
+
+  /**
    * Generate a browser automation task prompt based on the user's goal
-   * @param goal - The high-level goal the user wants to achieve (typically describes a problem/issue)
+   * @param goal - The high-level goal the user wants to achieve (typically describes a problem/issue or features to test)
    * @param url - The URL where the task should be performed
+   * @param features - Optional list of specific features to focus testing on
    * @returns A natural, exploratory task prompt that simulates a real user
    */
   static async generateBrowserTaskPrompt(
     goal: string,
-    url: string
+    url: string,
+    features?: string[]
   ): Promise<string> {
+    const featureFocus = features && features.length > 0 
+      ? `\n\nImportant: Focus testing on these specific new features:\n${features.map(f => `- ${f}`).join('\n')}`
+      : '';
+
     const { text } = await generateText({
       model,
       prompt: `You are an AI assistant that helps create natural, exploratory browser automation tasks that simulate real user behavior.
@@ -22,7 +85,7 @@ The experiment goal describes a problem or issue with a website. Your job is to 
 
 Given:
 - Issue/Problem: ${goal}
-- Website URL: ${url}
+- Website URL: ${url}${featureFocus}
 
 Create a natural browsing task that:
 1. Simulates how a real person would use the site

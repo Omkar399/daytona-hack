@@ -3,8 +3,6 @@
 import { useExperimentDetailQuery } from '@/query/experiment.query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ControlVariantCard } from './ControlVariantCard';
-import { VariantCard } from './VariantCard';
 import {
   RiFlaskLine,
   RiArrowLeftLine,
@@ -12,6 +10,10 @@ import {
   RiTargetLine,
 } from '@remixicon/react';
 import Link from 'next/link';
+import { SandboxCard } from './DevRel/SandboxCard';
+import { BrowserTaskCard } from './DevRel/BrowserTaskCard';
+import { ScreenshotsCard } from './DevRel/ScreenshotsCard';
+import { SocialPostCard } from './DevRel/SocialPostCard';
 
 interface ExperimentDetailContainerProps {
   experimentId: string;
@@ -88,7 +90,7 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <RiTargetLine size={20} />
-              Experiment Overview
+              DevRel Flow Status
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -124,67 +126,58 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
                 </p>
               </div>
             </div>
-
-            {experiment.variantSuggestions && experiment.variantSuggestions.length > 0 && (
-              <div className="pt-4 border-t">
-                <p className="text-sm font-medium text-neutral-700 mb-2">Variant Suggestions</p>
-                <ul className="list-disc list-inside space-y-1">
-                  {experiment.variantSuggestions.map((suggestion, idx) => (
-                    <li key={idx} className="text-sm text-neutral-600">
-                      {suggestion}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </CardContent>
         </Card>
 
-        {/* Control Variant Section */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-medium text-neutral-600">Control Variant</h2>
-          {experiment.controlVariant ? (
-            <ControlVariantCard controlVariant={experiment.controlVariant} />
-          ) : (
-            <Card>
-              <CardContent className="py-8 text-center">
-                <p className="text-sm text-neutral-500">
-                  Setting up control variant...
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+        {/* DevRel Flow Pipeline */}
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-sm font-semibold text-neutral-700 mb-3 flex items-center gap-2">
+              🚀 DevRel Pipeline
+            </h2>
 
-        {/* Variants Section */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-medium text-neutral-600">
-            Experimental Variants
-            {experiment.experimentalVariants && (
-              <span className="text-neutral-400 font-normal ml-1">
-                ({experiment.experimentalVariants.length})
-              </span>
-            )}
-          </h2>
-          {experiment.experimentalVariants && experiment.experimentalVariants.length > 0 ? (
-            <div className="space-y-3">
-              {experiment.experimentalVariants.map((variant, index) => (
-                <VariantCard
-                  key={variant.id}
-                  variant={variant}
-                  index={index}
-                />
-              ))}
+            {/* Step 1: Sandbox */}
+            <div className="mb-4">
+              <SandboxCard
+                status={experiment.status === 'pending' ? 'pending' : experiment.status === 'running' ? 'running' : experiment.status === 'completed' ? 'completed' : 'failed'}
+                sandboxId={experiment.controlVariant?.daytonaSandboxId}
+                sandboxUrl={experiment.controlVariant?.publicUrl}
+                createdAt={experiment.createdAt}
+              />
             </div>
-          ) : (
-            <Card>
-              <CardContent className="py-8 text-center">
-                <p className="text-sm text-neutral-500">
-                  Generating experimental variants...
-                </p>
-              </CardContent>
-            </Card>
-          )}
+
+            {/* Step 2: Browser Task */}
+            <div className="mb-4">
+              <BrowserTaskCard
+                status={experiment.status === 'pending' ? 'pending' : experiment.status === 'running' ? 'running' : 'completed'}
+                extractedFeatures={[]}
+                taskPrompt={experiment.goal}
+              />
+            </div>
+
+            {/* Step 3: Screenshots */}
+            <div className="mb-4">
+              <ScreenshotsCard
+                status={experiment.status === 'completed' ? 'completed' : 'pending'}
+                screenshots={experiment.experimentalVariants?.map((v: any, idx) => ({
+                  url: v.description || '',
+                  description: `Variant ${idx + 1}`,
+                  step: idx + 1,
+                })) || []}
+                totalCount={experiment.experimentalVariants?.length || 0}
+              />
+            </div>
+
+            {/* Step 4: Social Post */}
+            <div>
+              <SocialPostCard
+                status={experiment.status === 'completed' ? 'completed' : 'pending'}
+                postContent={experiment.variantSuggestions?.[0]}
+                hashtags={['#devrel', '#automation', '#featurelaunch']}
+                platform="all"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

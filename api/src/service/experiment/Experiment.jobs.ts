@@ -13,11 +13,11 @@ export interface ExperimentRunJobData {
   coderabbitSummary?: string;
 }
 
-const EXPERIMENT_RUN_JOB_ID = 'run-experiment';
+const EXPERIMENT_RUN_JOB_ID = 'experiment/run';
 
 export const runExperimentJob = inngestClient.createFunction(
-  { id: EXPERIMENT_RUN_JOB_ID },
-  { event: 'experiment/run' },
+  { id: 'run-experiment' },
+  { event: EXPERIMENT_RUN_JOB_ID },
   async ({ event, step }) => {
     const { experiment, prTitle, prSummary, coderabbitSummary } = event.data as ExperimentRunJobData;
 
@@ -43,10 +43,18 @@ export const runExperimentJob = inngestClient.createFunction(
           `🌐 Spawning browser agent to test new features`
         );
 
-        // Generate a task based on the PR summary
+        // Extract specific features from CodeRabbit summary
+        let features: string[] = [];
+        if (coderabbitSummary) {
+          features = await AiService.extractFeaturesFromSummary(coderabbitSummary);
+          console.log(`✨ Extracted features to test: ${features.join(', ')}`);
+        }
+
+        // Generate a task based on the PR summary and extracted features
         const taskPrompt = await AiService.generateBrowserTaskPrompt(
           prSummary || experiment.goal,
-          sandboxResult.variant.publicUrl
+          sandboxResult.variant.publicUrl,
+          features
         );
         console.log(`📝 Generated task prompt: ${taskPrompt}`);
 
@@ -73,20 +81,30 @@ export const runExperimentJob = inngestClient.createFunction(
         5 * 60 * 1000
       );
       console.log(`✅ Browser task completed with status: ${completedTask.status}`);
+      console.log(`   Task result:`, JSON.stringify(completedTask, null, 2));
 
       // Get task steps which include screenshots
       const taskSteps = await BrowserService.getTaskSteps(browserAgentResult.taskId);
-      console.log(`📸 Collected ${taskSteps.length} steps with screenshots`);
+      console.log(`📸 Collected ${taskSteps.length} steps`);
+      
+      // Debug: log first few steps to see structure
+      if (taskSteps.length > 0) {
+        console.log(`   First step structure:`, JSON.stringify(taskSteps[0], null, 2));
+      }
 
       // Extract screenshot URLs from steps
       const screenshots = taskSteps
-        .filter((step: any) => step.screenshot)
+        .filter((step: any) => step.screenshotUrl)
         .map((step: any) => ({
-          url: step.screenshot,
-          description: step.summary || 'Feature demonstration',
+          url: step.screenshotUrl,
+          description: step.nextGoal || step.memory || 'Feature demonstration',
         }));
 
       console.log(`🖼️  Found ${screenshots.length} screenshots`);
+      
+      if (screenshots.length === 0 && taskSteps.length > 0) {
+        console.warn(`⚠️  No screenshots found but ${taskSteps.length} steps exist. Step keys:`, Object.keys(taskSteps[0]));
+      }
 
       return {
         taskId: browserAgentResult.taskId,
@@ -116,6 +134,7 @@ export const runExperimentJob = inngestClient.createFunction(
 
     // Update experiment with results
     await step.run('save-results', async () => {
+      // Update experiment status and save social post
       await db
         .update(experimentsTable)
         .set({
@@ -126,6 +145,32 @@ export const runExperimentJob = inngestClient.createFunction(
         .where(eq(experimentsTable.id, experiment.id));
 
       console.log(`✅ Experiment ${experiment.id} completed`);
+      
+      // Save screenshots as variants
+      console.log(`💾 Saving ${postResult.screenshots.length} screenshots to database...`);
+      
+      const { variantsTable } = await import('@/db/variant.db');
+      const { generateId } = await import('@/lib/id');
+      
+      for (const screenshot of postResult.screenshots) {
+        await db.insert(variantsTable).values({
+          id: generateId('variant'),
+          createdAt: new Date().toISOString(),
+          experimentId: experiment.id,
+          daytonaSandboxId: sandboxResult.variant.daytonaSandboxId,
+          publicUrl: sandboxResult.variant.publicUrl,
+          type: 'experiment',
+          suggestion: screenshot.url, // Store screenshot URL in suggestion field
+          analysis: {
+            success: true,
+            summary: screenshot.description,
+            insights: [],
+            issues: [],
+          },
+        });
+      }
+      
+      console.log(`✅ Saved ${postResult.screenshots.length} screenshots`);
     });
 
     console.log(`

@@ -1,4 +1,4 @@
-import { RiGitBranchLine, RiTargetLine, RiLineChartLine } from "@remixicon/react";
+import { RiGitBranchLine, RiCameraLine, RiShareForwardLine } from "@remixicon/react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function FeatureCards() {
@@ -6,30 +6,30 @@ export function FeatureCards() {
     <div className="grid md:grid-cols-3 gap-4">
       <Card>
         <CardHeader>
-          <RiGitBranchLine className="h-8 w-8 mb-2 text-primary" />
-          <CardTitle className="text-lg">Repository Integration</CardTitle>
+          <RiGitBranchLine className="h-8 w-8 mb-2 text-blue-600" />
+          <CardTitle className="text-lg">GitHub Webhook Integration</CardTitle>
           <CardDescription>
-            Connect your GitHub repository and let AI generate optimized variants
+            Automatically trigger when PRs are merged with CodeRabbit analysis
           </CardDescription>
         </CardHeader>
       </Card>
 
       <Card>
         <CardHeader>
-          <RiTargetLine className="h-8 w-8 mb-2 text-primary" />
-          <CardTitle className="text-lg">Goal-Driven Testing</CardTitle>
+          <RiCameraLine className="h-8 w-8 mb-2 text-blue-600" />
+          <CardTitle className="text-lg">Automated Browser Testing</CardTitle>
           <CardDescription>
-            Define your objectives and let AI optimize for your specific goals
+            AI agent explores new features and captures professional screenshots
           </CardDescription>
         </CardHeader>
       </Card>
 
       <Card>
         <CardHeader>
-          <RiLineChartLine className="h-8 w-8 mb-2 text-primary" />
-          <CardTitle className="text-lg">Automated Optimization</CardTitle>
+          <RiShareForwardLine className="h-8 w-8 mb-2 text-blue-600" />
+          <CardTitle className="text-lg">Social Media Ready</CardTitle>
           <CardDescription>
-            Browser agents test variants and merge winning changes automatically
+            Generate engaging posts with screenshots ready to share
           </CardDescription>
         </CardHeader>
       </Card>

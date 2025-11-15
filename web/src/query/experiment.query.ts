@@ -10,80 +10,16 @@ interface Experiment {
   createdAt: string;
   updatedAt: string;
   variantSuggestions?: string[];
-}
-
-interface Variant {
-  id: string;
-  createdAt: string;
-  experimentId: string;
-  daytonaSandboxId: string;
-  publicUrl: string;
-  type: 'control' | 'experiment';
-  suggestion: string | null;
-  analysis: {
-    success: boolean;
-    summary: string;
-    insights: string[];
-    issues: string[];
-  } | null;
-}
-
-interface Agent {
-  id: string;
-  createdAt: string;
-  experimentId: string;
-  variantId: string;
-  browserTaskId: string;
-  browserLiveUrl: string | null;
-  taskPrompt: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  result: {
-    success: boolean;
-    summary: string;
-    insights: string[];
-    issues: string[];
-  } | null;
-  rawLogs: string | null;
-}
-
-interface CodeAgent {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  experimentId: string;
-  variantId: string;
-  claudeSessionId: string | null;
-  daytonaSandboxId: string;
-  suggestion: string;
-  implementationPrompt: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  implementationSummary: string | null;
-  filesModified: string[] | null;
-  codeChanges: {
-    file: string;
-    changes: string;
-  }[] | null;
-  logs: string | null;
-  errorMessage: string | null;
-  startedAt: string | null;
-  completedAt: string | null;
-}
-
-// UI-specific types for display
-interface ControlVariant extends Variant {
-  type: 'control';
-  browserAgent?: Agent;
-}
-
-interface ExperimentalVariant extends Variant {
-  type: 'experiment';
-  browserAgent?: Agent;
-  codeAgent?: CodeAgent;
-}
-
-interface ExperimentDetail extends Experiment {
-  controlVariant?: ControlVariant;
-  experimentalVariants?: ExperimentalVariant[];
+  controlVariant?: {
+    id: string;
+    daytonaSandboxId: string;
+    publicUrl: string;
+    type: 'control';
+  };
+  experimentalVariants?: Array<{
+    id: string;
+    description: string;
+  }>;
 }
 
 interface StartExperimentInput {
@@ -119,68 +55,18 @@ export const useExperimentsQuery = () => {
 export const useExperimentDetailQuery = (experimentId: string | null) => {
   const query = useQuery({
     queryKey: ['experiment', experimentId],
-    queryFn: async (): Promise<ExperimentDetail> => {
+    queryFn: async (): Promise<Experiment> => {
       if (!experimentId) {
         throw new Error('Experiment ID is required');
       }
 
-      // Fetch experiment
+      // Fetch experiment - returns all data we need for DevRel flow
       const experimentResponse = await API_CLIENT.fetch(`/experiment/${experimentId}`, {
         method: 'GET',
       });
-      const experiment: Experiment = experimentResponse[0];
-
-      // Fetch all variants for this experiment
-      const variants: Variant[] = await API_CLIENT.fetch(
-        `/variant/experiment/${experimentId}`,
-        { method: 'GET' }
-      );
-
-      // Fetch all agents for this experiment
-      const agents: Agent[] = await API_CLIENT.fetch(
-        `/agent/experiment/${experimentId}`,
-        { method: 'GET' }
-      );
-
-      // Fetch all code agents for this experiment
-      const codeAgents: CodeAgent[] = await API_CLIENT.fetch(
-        `/code-agent/experiment/${experimentId}`,
-        { method: 'GET' }
-      );
-
-      // Find control variant
-      const controlVariantData = variants.find((v) => v.type === 'control');
-      let controlVariant: ControlVariant | undefined;
-
-      if (controlVariantData) {
-        const controlAgent = agents.find((a) => a.variantId === controlVariantData.id);
-        controlVariant = {
-          ...controlVariantData,
-          type: 'control',
-          browserAgent: controlAgent,
-        };
-      }
-
-      // Build experimental variants
-      const experimentalVariants: ExperimentalVariant[] = variants
-        .filter((v) => v.type === 'experiment')
-        .map((variant) => {
-          const agent = agents.find((a) => a.variantId === variant.id);
-          const codeAgent = codeAgents.find((ca) => ca.variantId === variant.id);
-
-          return {
-            ...variant,
-            type: 'experiment',
-            browserAgent: agent,
-            codeAgent,
-          };
-        });
-
-      return {
-        ...experiment,
-        controlVariant,
-        experimentalVariants,
-      };
+      
+      // API returns array, get first element
+      return experimentResponse[0] || experimentResponse;
     },
     enabled: !!experimentId,
   });

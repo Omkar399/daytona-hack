@@ -2,8 +2,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
   RiTimeLine,
   RiArrowRightLine,
-  RiCheckLine,
+  RiCheckboxCircleLine,
   RiLoader4Line,
+  RiFlaskLine,
 } from '@remixicon/react';
 import Link from 'next/link';
 
@@ -23,18 +24,22 @@ export const ExperimentListCard = ({ experiment }: ExperimentListCardProps) => {
     pending: {
       icon: <RiTimeLine size={12} />,
       label: 'Pending',
+      color: 'bg-yellow-50 text-yellow-700 border-yellow-200',
     },
     running: {
       icon: <RiLoader4Line size={12} className="animate-spin" />,
-      label: 'Running',
+      label: 'Testing Features',
+      color: 'bg-blue-50 text-blue-700 border-blue-200',
     },
     completed: {
-      icon: <RiCheckLine size={12} />,
-      label: 'Completed',
+      icon: <RiCheckboxCircleLine size={12} />,
+      label: 'Post Ready',
+      color: 'bg-green-50 text-green-700 border-green-200',
     },
     failed: {
       icon: <RiTimeLine size={12} />,
       label: 'Failed',
+      color: 'bg-red-50 text-red-700 border-red-200',
     },
   };
 
@@ -61,14 +66,15 @@ export const ExperimentListCard = ({ experiment }: ExperimentListCardProps) => {
         <CardContent className="py-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-2">
+                <RiFlaskLine size={14} className="text-neutral-500" />
                 <span className="text-xs text-neutral-500 font-mono truncate">
                   {repoName}
                 </span>
                 <span className="text-neutral-300">•</span>
-                <div className="flex items-center gap-1 text-neutral-500">
+                <div className={`flex items-center gap-1 text-xs px-2 py-1 rounded border ${config.color}`}>
                   {config.icon}
-                  <span className="text-xs">{config.label}</span>
+                  <span>{config.label}</span>
                 </div>
               </div>
               <h3 className="text-sm font-medium text-neutral-900 mb-2 line-clamp-2">
