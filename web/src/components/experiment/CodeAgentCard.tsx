@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  RiGitPullRequestLine,
-  RiExternalLinkLine,
-  RiLoader4Line,
-  RiCheckLine,
-  RiTimeLine,
-} from '@remixicon/react';
+  GitPullRequestIcon,
+  ExternalLinkIcon,
+  LoaderIcon,
+  CheckIcon,
+  TimeIcon,
+} from '@/components/icons';
 
 interface CodeAgentCardProps {
   codeAgent: {
@@ -22,19 +22,19 @@ interface CodeAgentCardProps {
 export const CodeAgentCard = ({ codeAgent, variantDescription }: CodeAgentCardProps) => {
   const statusConfig = {
     pending: {
-      icon: <RiTimeLine size={12} />,
+      icon: <TimeIcon size={12} />,
       label: 'Pending',
     },
     running: {
-      icon: <RiLoader4Line size={12} className="animate-spin" />,
+      icon: <LoaderIcon size={12} className="animate-spin" />,
       label: 'Running',
     },
     completed: {
-      icon: <RiCheckLine size={12} />,
+      icon: <CheckIcon size={12} />,
       label: 'Completed',
     },
     failed: {
-      icon: <RiTimeLine size={12} />,
+      icon: <TimeIcon size={12} />,
       label: 'Failed',
     },
   };
@@ -72,9 +72,9 @@ export const CodeAgentCard = ({ codeAgent, variantDescription }: CodeAgentCardPr
               className="w-full justify-start h-8"
               onClick={() => window.open(codeAgent.prUrl, '_blank')}
             >
-              <RiGitPullRequestLine size={12} className="mr-2" />
+              <GitPullRequestIcon size={12} className="mr-2" />
               View Pull Request
-              <RiExternalLinkLine size={10} className="ml-auto" />
+              <ExternalLinkIcon size={10} className="ml-auto" />
             </Button>
           )}
 
@@ -86,7 +86,7 @@ export const CodeAgentCard = ({ codeAgent, variantDescription }: CodeAgentCardPr
               className="w-full justify-start h-8"
               onClick={() => window.open(codeAgent.publicUrl, '_blank')}
             >
-              <RiExternalLinkLine size={12} className="mr-2" />
+              <ExternalLinkIcon size={12} className="mr-2" />
               View Preview
             </Button>
           )}
@@ -95,7 +95,7 @@ export const CodeAgentCard = ({ codeAgent, variantDescription }: CodeAgentCardPr
         {/* Status Messages */}
         {codeAgent.status === 'running' && (
           <div className="flex items-start gap-2 text-neutral-600 bg-neutral-50 p-2 rounded border">
-            <RiLoader4Line size={12} className="animate-spin mt-0.5 flex-shrink-0" />
+            <LoaderIcon size={12} className="animate-spin mt-0.5 flex-shrink-0" />
             <p className="text-xs">Creating changes...</p>
           </div>
         )}

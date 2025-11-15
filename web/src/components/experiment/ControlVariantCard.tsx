@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RiExternalLinkLine, RiLoader4Line } from '@remixicon/react';
+import { ExternalLinkIcon, LoaderIcon } from '@/components/icons';
 
 interface ControlVariantCardProps {
   controlVariant: {
@@ -48,15 +48,15 @@ export const ControlVariantCard = ({
           <p className='text-sm font-medium text-neutral-700 mb-2'>
             Preview URL
           </p>
-          <Button
-            variant='outline'
-            size='sm'
-            className='w-full justify-start font-mono text-sm h-9'
-            onClick={() => window.open(controlVariant.publicUrl, '_blank')}
-          >
-            <RiExternalLinkLine size={14} className='mr-2 flex-shrink-0' />
-            <span className='truncate'>{controlVariant.publicUrl}</span>
-          </Button>
+            <Button
+              variant='outline'
+              size='sm'
+              className='w-full justify-start font-mono text-sm h-9'
+              onClick={() => window.open(controlVariant.publicUrl, '_blank')}
+            >
+              <ExternalLinkIcon size={14} className='mr-2 flex-shrink-0' />
+              <span className='truncate'>{controlVariant.publicUrl}</span>
+            </Button>
         </div>
 
         {/* Browser Agent Section */}
@@ -84,7 +84,7 @@ export const ControlVariantCard = ({
                   )
                 }
               >
-                <RiExternalLinkLine size={14} className='mr-2' />
+                <ExternalLinkIcon size={14} className='mr-2' />
                 View Browser Session
               </Button>
             )}
@@ -136,7 +136,7 @@ export const ControlVariantCard = ({
             {/* Running state */}
             {controlVariant.browserAgent.status === 'running' && (
               <div className='flex items-center gap-2 text-neutral-600 bg-neutral-50 p-3 rounded border'>
-                <RiLoader4Line size={16} className='animate-spin' />
+                <LoaderIcon size={16} className='animate-spin' />
                 <p className='text-sm'>Analyzing...</p>
               </div>
             )}

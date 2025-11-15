@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  RiLoader4Line,
-  RiCheckLine,
-  RiTimeLine,
-  RiGitPullRequestLine,
-  RiExternalLinkLine,
-} from '@remixicon/react';
+  LoaderIcon,
+  CheckIcon,
+  TimeIcon,
+  GitPullRequestIcon,
+  ExternalLinkIcon,
+} from '@/components/icons';
 
 interface VariantCardProps {
   variant: {
@@ -34,19 +34,19 @@ interface VariantCardProps {
 export const VariantCard = ({ variant, index }: VariantCardProps) => {
   const codeAgentStatusConfig = {
     pending: {
-      icon: <RiTimeLine size={12} />,
+      icon: <TimeIcon size={12} />,
       label: 'Pending',
     },
     running: {
-      icon: <RiLoader4Line size={12} className="animate-spin" />,
+      icon: <LoaderIcon size={12} className="animate-spin" />,
       label: 'Running',
     },
     completed: {
-      icon: <RiCheckLine size={12} />,
+      icon: <CheckIcon size={12} />,
       label: 'Completed',
     },
     failed: {
-      icon: <RiTimeLine size={12} />,
+      icon: <TimeIcon size={12} />,
       label: 'Failed',
     },
   };
@@ -133,7 +133,7 @@ export const VariantCard = ({ variant, index }: VariantCardProps) => {
                   className="w-full justify-start h-8"
                   onClick={() => window.open(variant.publicUrl, '_blank')}
                 >
-                  <RiExternalLinkLine size={12} className="mr-2" />
+                  <ExternalLinkIcon size={12} className="mr-2" />
                   View Preview
                 </Button>
               </div>
@@ -142,7 +142,7 @@ export const VariantCard = ({ variant, index }: VariantCardProps) => {
             {/* Status Messages */}
             {codeAgent.status === 'running' && (
               <div className="flex items-start gap-2 text-neutral-600 bg-neutral-50 p-2 rounded border">
-                <RiLoader4Line size={12} className="animate-spin mt-0.5 flex-shrink-0" />
+                <LoaderIcon size={12} className="animate-spin mt-0.5 flex-shrink-0" />
                 <p className="text-xs">Creating changes...</p>
               </div>
             )}

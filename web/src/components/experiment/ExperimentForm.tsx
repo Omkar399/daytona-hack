@@ -1,4 +1,4 @@
-import { RiFlaskLine, RiGitBranchLine, RiTargetLine } from "@remixicon/react";
+import { FlaskIcon, GitBranchIcon, TargetIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,7 +32,7 @@ export function ExperimentForm({ formData, onFormDataChange, onSubmit, onCancel,
           {/* Git Repository URL */}
           <div className="space-y-2">
             <Label htmlFor="repoUrl" className="text-base font-semibold flex items-center gap-2">
-              <RiGitBranchLine className="h-4 w-4" />
+              <GitBranchIcon size={16} />
               Git Repository URL
             </Label>
             <Input
@@ -52,7 +52,7 @@ export function ExperimentForm({ formData, onFormDataChange, onSubmit, onCancel,
           {/* Task / Prompt */}
           <div className="space-y-2">
             <Label htmlFor="goal" className="text-base font-semibold flex items-center gap-2">
-              <RiTargetLine className="h-4 w-4" />
+              <TargetIcon size={16} />
               Task / Prompt
             </Label>
             <Textarea
@@ -71,7 +71,7 @@ export function ExperimentForm({ formData, onFormDataChange, onSubmit, onCancel,
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
             <Button type="submit" size="lg" className="flex-1 gap-2" disabled={isSubmitting}>
-              <RiFlaskLine className="h-5 w-5" />
+              <FlaskIcon size={20} />
               {isSubmitting ? "Starting..." : "Start Experiment"}
             </Button>
             <Button

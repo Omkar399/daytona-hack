@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import { ControlVariantCard } from './ControlVariantCard';
 import { VariantCard } from './VariantCard';
 import {
-  RiFlaskLine,
-  RiArrowLeftLine,
-  RiGitRepositoryLine,
-  RiTargetLine,
-} from '@remixicon/react';
+  FlaskIcon,
+  ArrowLeftIcon,
+  GitRepositoryIcon,
+  TargetIcon,
+} from '@/components/icons';
 import Link from 'next/link';
 
 interface ExperimentDetailContainerProps {
@@ -24,7 +24,7 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
     return (
       <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center">
         <div className="text-center">
-          <RiFlaskLine size={48} className="mx-auto mb-4 text-neutral-400 animate-pulse" />
+          <FlaskIcon size={48} className="mx-auto mb-4 text-neutral-400 animate-pulse" />
           <p className="text-neutral-600">Loading experiment details...</p>
         </div>
       </div>
@@ -44,7 +44,7 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
             </p>
             <Link href="/">
               <Button>
-                <RiArrowLeftLine size={16} className="mr-2" />
+                <ArrowLeftIcon size={16} className="mr-2" />
                 Back to Dashboard
               </Button>
             </Link>
@@ -71,7 +71,7 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
           <div className="flex items-center gap-4">
             <Link href="/">
               <Button variant="outline" size="sm">
-                <RiArrowLeftLine size={16} className="mr-2" />
+                <ArrowLeftIcon size={16} className="mr-2" />
                 Back
               </Button>
             </Link>
@@ -87,14 +87,14 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <RiTargetLine size={20} />
+              <TargetIcon size={20} />
               Experiment Overview
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <RiGitRepositoryLine size={18} className="text-neutral-600" />
+                <GitRepositoryIcon size={18} className="text-neutral-600" />
                 <p className="text-sm font-medium text-neutral-700">Repository</p>
               </div>
               <p className="text-sm text-neutral-600 font-mono bg-neutral-50 p-2 rounded">
@@ -104,7 +104,7 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
 
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <RiTargetLine size={18} className="text-neutral-600" />
+                <TargetIcon size={18} className="text-neutral-600" />
                 <p className="text-sm font-medium text-neutral-700">Goal</p>
               </div>
               <p className="text-sm text-neutral-600">{experiment.goal}</p>

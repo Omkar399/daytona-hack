@@ -1,10 +1,10 @@
 import { Card, CardContent } from '@/components/ui/card';
 import {
-  RiTimeLine,
-  RiArrowRightLine,
-  RiCheckLine,
-  RiLoader4Line,
-} from '@remixicon/react';
+  TimeIcon,
+  ArrowRightIcon,
+  CheckIcon,
+  LoaderIcon,
+} from '@/components/icons';
 import Link from 'next/link';
 
 interface ExperimentListCardProps {
@@ -21,19 +21,19 @@ interface ExperimentListCardProps {
 export const ExperimentListCard = ({ experiment }: ExperimentListCardProps) => {
   const statusConfig = {
     pending: {
-      icon: <RiTimeLine size={12} />,
+      icon: <TimeIcon size={12} />,
       label: 'Pending',
     },
     running: {
-      icon: <RiLoader4Line size={12} className="animate-spin" />,
+      icon: <LoaderIcon size={12} className="animate-spin" />,
       label: 'Running',
     },
     completed: {
-      icon: <RiCheckLine size={12} />,
+      icon: <CheckIcon size={12} />,
       label: 'Completed',
     },
     failed: {
-      icon: <RiTimeLine size={12} />,
+      icon: <TimeIcon size={12} />,
       label: 'Failed',
     },
   };
@@ -81,7 +81,7 @@ export const ExperimentListCard = ({ experiment }: ExperimentListCardProps) => {
               </div>
             </div>
             <div className="flex items-center gap-1 text-neutral-400 group-hover:text-neutral-900 transition-colors">
-              <RiArrowRightLine size={16} className="group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRightIcon size={16} className="group-hover:translate-x-0.5 transition-transform" />
             </div>
           </div>
         </CardContent>

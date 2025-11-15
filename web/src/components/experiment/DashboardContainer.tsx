@@ -8,7 +8,7 @@ import { ExperimentForm } from "./ExperimentForm";
 import { ExperimentListCard } from "./ExperimentListCard";
 import { useStartExperimentMutation, useExperimentsQuery } from "@/query/experiment.query";
 import { Card, CardContent } from "@/components/ui/card";
-import { RiFlaskLine, RiLoader4Line } from "@remixicon/react";
+import { FlaskIcon, LoaderIcon } from "@/components/icons";
 
 export function DashboardContainer() {
   const [showForm, setShowForm] = useState(false);
@@ -48,7 +48,7 @@ export function DashboardContainer() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-neutral-900 flex items-center gap-2">
-                  <RiFlaskLine size={24} className="text-neutral-700" />
+                  <FlaskIcon size={24} className="text-neutral-700" />
                   Your Experiments
                   {experiments && (
                     <span className="text-base text-neutral-500 font-normal">
@@ -61,7 +61,7 @@ export function DashboardContainer() {
               {isLoadingExperiments ? (
                 <Card>
                   <CardContent className="py-12 text-center">
-                    <RiLoader4Line size={32} className="mx-auto mb-3 text-neutral-400 animate-spin" />
+                    <LoaderIcon size={32} className="mx-auto mb-3 text-neutral-400 animate-spin" />
                     <p className="text-sm text-neutral-500">Loading experiments...</p>
                   </CardContent>
                 </Card>
@@ -74,7 +74,7 @@ export function DashboardContainer() {
               ) : (
                 <Card>
                   <CardContent className="py-12 text-center">
-                    <RiFlaskLine size={48} className="mx-auto mb-3 text-neutral-300" />
+                    <FlaskIcon size={48} className="mx-auto mb-3 text-neutral-300" />
                     <h3 className="text-base font-semibold text-neutral-700 mb-1">
                       No experiments yet
                     </h3>

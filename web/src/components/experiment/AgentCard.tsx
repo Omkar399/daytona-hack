@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RiRobotLine, RiExternalLinkLine, RiCheckboxCircleLine, RiErrorWarningLine } from '@remixicon/react';
+import { RobotIcon, ExternalLinkIcon, CheckboxCircleIcon, ErrorWarningIcon } from '@/components/icons';
 
 interface AgentCardProps {
   agent: {
@@ -34,7 +34,7 @@ export const AgentCard = ({ agent, variantName }: AgentCardProps) => {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
-            <RiRobotLine size={18} className="text-neutral-600" />
+            <RobotIcon size={18} className="text-neutral-600" />
             <CardTitle className="text-sm">
               Agent {agent.id.slice(0, 8)}
             </CardTitle>
@@ -60,9 +60,9 @@ export const AgentCard = ({ agent, variantName }: AgentCardProps) => {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               {agent.result.success ? (
-                <RiCheckboxCircleLine size={16} className="text-green-600" />
+                <CheckboxCircleIcon size={16} className="text-green-600" />
               ) : (
-                <RiErrorWarningLine size={16} className="text-red-600" />
+                <ErrorWarningIcon size={16} className="text-red-600" />
               )}
               <p className="text-xs font-medium text-neutral-700">
                 {agent.result.success ? 'Completed Successfully' : 'Completed with Issues'}
@@ -104,7 +104,7 @@ export const AgentCard = ({ agent, variantName }: AgentCardProps) => {
             className="w-full"
             onClick={() => window.open(agent.browserLiveUrl, '_blank')}
           >
-            <RiExternalLinkLine size={16} className="mr-2" />
+            <ExternalLinkIcon size={16} className="mr-2" />
             View Live Session
           </Button>
         )}

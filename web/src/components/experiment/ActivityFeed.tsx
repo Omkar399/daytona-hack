@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RiTimeLine, RiLightbulbLine, RiTerminalLine } from '@remixicon/react';
+import { TimeIcon, LightbulbIcon, TerminalIcon } from '@/components/icons';
 
 interface ActivityLog {
   id: string;
@@ -90,13 +90,13 @@ export const ActivityFeed = ({ logs = placeholderLogs }: ActivityFeedProps) => {
   const getIcon = (type: ActivityLog['type']) => {
     switch (type) {
       case 'thinking':
-        return <RiLightbulbLine size={16} className="text-purple-600" />;
+        return <LightbulbIcon size={16} className="text-purple-600" />;
       case 'log':
-        return <RiTerminalLine size={16} className="text-blue-600" />;
+        return <TerminalIcon size={16} className="text-blue-600" />;
       case 'event':
-        return <RiTimeLine size={16} className="text-green-600" />;
+        return <TimeIcon size={16} className="text-green-600" />;
       default:
-        return <RiTimeLine size={16} className="text-neutral-600" />;
+        return <TimeIcon size={16} className="text-neutral-600" />;
     }
   };
 

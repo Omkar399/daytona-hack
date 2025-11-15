@@ -1,4 +1,4 @@
-import { RiFlaskLine } from "@remixicon/react";
+import { FlaskIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -17,7 +17,7 @@ export function WelcomeCard({ onNewExperiment }: WelcomeCardProps) {
       </CardHeader>
       <CardContent>
         <Button onClick={onNewExperiment} size="lg" className="gap-2">
-          <RiFlaskLine className="h-5 w-5" />
+          <FlaskIcon size={20} />
           New Experiment
         </Button>
       </CardContent>
