@@ -211,3 +211,98 @@ export const createExperimentJob = async (data: ExperimentRunJobData) => {
     data: data,
   });
 };
+
+// Post to X job
+const POST_TO_X_JOB_ID = 'experiment/post-to-x';
+
+export const runPostToXJob = inngestClient.createFunction(
+  { id: 'post-to-x' },
+  { event: POST_TO_X_JOB_ID },
+  async ({ event, step }) => {
+    const { experimentId } = event.data as { experimentId: string };
+
+    console.log(`🐦 Starting post to X for experiment ${experimentId}`);
+
+    // Get experiment data
+    const experiment = await step.run('fetch-experiment', async () => {
+      const experiments = await db
+        .select()
+        .from(experimentsTable)
+        .where(eq(experimentsTable.id, experimentId as any))
+        .limit(1);
+
+      if (experiments.length === 0) {
+        throw new Error(`Experiment ${experimentId} not found`);
+      }
+
+      return experiments[0];
+    });
+
+    // Get screenshots from variants
+    const screenshots = await step.run('fetch-screenshots', async () => {
+      const { variantsTable } = await import('@/db/variant.db');
+
+      const variants = await db
+        .select()
+        .from(variantsTable)
+        .where(eq(variantsTable.experimentId, experimentId as any));
+
+      const experimentalVariants = variants.filter((v) => v.type === 'experiment');
+
+      return experimentalVariants
+        .map((v) => v.suggestion)
+        .filter((url): url is string => !!url);
+    });
+
+    console.log(`📸 Found ${screenshots.length} screenshots to attach`);
+
+    // Post to X
+    const postResult = await step.run('post-to-x', async () => {
+      const postContent = experiment.variantSuggestions?.[0] || 'Check out our new feature!';
+
+      console.log(`📝 Posting to X with content: ${postContent.substring(0, 100)}...`);
+
+      const result = await BrowserService.postToX(postContent, screenshots);
+
+      return result;
+    });
+
+    // Update experiment with posted status
+    await step.run('update-experiment', async () => {
+      await db
+        .update(experimentsTable)
+        .set({
+          postApprovalStatus: 'posted',
+          postedToXAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(experimentsTable.id, experimentId as any));
+
+      console.log(`✅ Experiment ${experimentId} posted to X successfully`);
+    });
+
+    console.log(`
+🎉 POST TO X COMPLETE!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Experiment: ${experimentId}
+✅ Screenshots attached: ${screenshots.length}
+✅ Task ID: ${postResult.taskId}
+✅ Status: ${postResult.status}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    `);
+
+    return {
+      experimentId,
+      taskId: postResult.taskId,
+      status: postResult.status,
+      screenshotsPosted: screenshots.length,
+    };
+  }
+);
+
+export const postToXJob = async (data: { experimentId: string }) => {
+  await inngestClient.send({
+    name: POST_TO_X_JOB_ID,
+    data: data,
+  });
+};

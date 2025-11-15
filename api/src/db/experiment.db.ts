@@ -12,6 +12,10 @@ export const experimentsTable = pgTable('experiments', {
     .notNull()
     .default('pending'),
   variantSuggestions: jsonb('variant_suggestions').$type<string[]>(),
+  postApprovalStatus: text('post_approval_status')
+    .$type<'pending' | 'approved' | 'rejected' | 'posted'>()
+    .default('pending'),
+  postedToXAt: timestamp('posted_to_x_at', { mode: 'string' }),
 });
 
 export type ExperimentEntity = typeof experimentsTable.$inferSelect;
