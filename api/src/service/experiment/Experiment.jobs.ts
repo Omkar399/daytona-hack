@@ -43,10 +43,18 @@ export const runExperimentJob = inngestClient.createFunction(
           `🌐 Spawning browser agent to test new features`
         );
 
-        // Generate a task based on the PR summary
+        // Extract specific features from CodeRabbit summary
+        let features: string[] = [];
+        if (coderabbitSummary) {
+          features = await AiService.extractFeaturesFromSummary(coderabbitSummary);
+          console.log(`✨ Extracted features to test: ${features.join(', ')}`);
+        }
+
+        // Generate a task based on the PR summary and extracted features
         const taskPrompt = await AiService.generateBrowserTaskPrompt(
           prSummary || experiment.goal,
-          sandboxResult.variant.publicUrl
+          sandboxResult.variant.publicUrl,
+          features
         );
         console.log(`📝 Generated task prompt: ${taskPrompt}`);
 
@@ -80,10 +88,10 @@ export const runExperimentJob = inngestClient.createFunction(
 
       // Extract screenshot URLs from steps
       const screenshots = taskSteps
-        .filter((step: any) => step.screenshot)
+        .filter((step: any) => step.screenshotUrl)
         .map((step: any) => ({
-          url: step.screenshot,
-          description: step.summary || 'Feature demonstration',
+          url: step.screenshotUrl,
+          description: step.nextGoal || step.memory || 'Feature demonstration',
         }));
 
       console.log(`🖼️  Found ${screenshots.length} screenshots`);

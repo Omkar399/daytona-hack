@@ -1,6 +1,6 @@
 import { BrowserService } from '@/service/browser/Browser.service';
 
-const SANDBOX_URL = 'https://3000-0f74704c-6ab8-4779-9b65-12af5d7574b2.proxy.daytona.works/';
+const SANDBOX_URL = 'https://3000-b2e30c36-bf93-42eb-9098-41cdc9a4b220.proxy.daytona.works';
 
 async function testBrowserAgent() {
   console.log('🧪 Testing Browser Agent with Sandbox\n');
@@ -10,10 +10,16 @@ async function testBrowserAgent() {
     // Step 1: Create a browser task
     console.log('📝 Step 1: Creating browser task...');
     const task = await BrowserService.createTask(
-      `You are a customer browsing an e-commerce site. 
-      Please explore the product list, look at a few products, 
-      and try to add something to your cart. 
-      Tell me what you observe about the site's features and user experience.`,
+      `You are a customer browsing an e-commerce site.
+
+Simple task:
+1. Wait for the page to load and click "Continue" or dismiss any warnings
+2. Look at the product list and click "Add to Cart" on the first product you see
+3. Navigate to the cart page (look for a Cart button/link)
+4. Take a screenshot of the cart showing the product(s) and total price
+5. Report what you see in the cart
+
+Keep it simple and straightforward.`,
       SANDBOX_URL
     );
     
@@ -38,14 +44,32 @@ async function testBrowserAgent() {
     console.log(`✅ Found ${screenshotSteps.length} screenshots\n`);
 
     if (screenshotSteps.length > 0) {
-      console.log('📷 Screenshots:');
+      console.log('📷 Screenshots from Shopping Journey:');
       screenshotSteps.forEach((step: any, index: number) => {
-        console.log(`\n   Screenshot ${index + 1}:`);
-        console.log(`   - Step #${step.number}`);
-        console.log(`   - URL: ${step.screenshotUrl}`);
-        console.log(`   - Memory: ${step.memory || 'No memory'}`);
-        console.log(`   - Next Goal: ${step.nextGoal || 'No goal'}`);
+        console.log(`\n   📸 Screenshot ${index + 1} (Step #${step.number}):`);
+        console.log(`   ├─ URL: ${step.screenshotUrl}`);
+        console.log(`   ├─ What happened: ${step.memory || 'No details'}`);
+        console.log(`   └─ Next action: ${step.nextGoal || 'Task complete'}`);
       });
+      
+      // Find and highlight cart screenshots
+      const cartSteps = screenshotSteps.filter((step: any) => 
+        step.memory?.toLowerCase().includes('cart') || 
+        step.nextGoal?.toLowerCase().includes('cart')
+      );
+      
+      if (cartSteps.length > 0) {
+        console.log('\n\n🛒 CART SCREENSHOTS:');
+        cartSteps.forEach((step: any) => {
+          console.log(`   - Step #${step.number}: ${step.screenshotUrl}`);
+        });
+      } else {
+        console.log('\n\n💡 Tip: Most recent screenshots (likely cart):');
+        const lastThreeSteps = screenshotSteps.slice(-3);
+        lastThreeSteps.forEach((step: any) => {
+          console.log(`   - Step #${step.number}: ${step.screenshotUrl}`);
+        });
+      }
     }
 
     // Step 4: Get full logs

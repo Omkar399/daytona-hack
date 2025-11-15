@@ -20,12 +20,46 @@ export const experimentRoutes = new Elysia({ prefix: '/experiment' })
   })
   .get(
     '/:id',
-    ({ params }) => {
-      return db
+    async ({ params }) => {
+      const experimentId = params.id as Id<'experiment'>;
+      
+      // Get the experiment
+      const experiments = await db
         .select()
         .from(experimentsTable)
-        .where(eq(experimentsTable.id, params.id as Id<'experiment'>))
+        .where(eq(experimentsTable.id, experimentId))
         .limit(1);
+
+      if (experiments.length === 0) {
+        return null;
+      }
+
+      const experiment = experiments[0];
+
+      // Get all variants for this experiment
+      const variants = await db
+        .select()
+        .from(variantsTable)
+        .where(eq(variantsTable.experimentId, experimentId));
+
+      // Separate control and experimental variants
+      const controlVariant = variants.find((v) => v.type === 'control');
+      const experimentalVariants = variants.filter((v) => v.type === 'experiment');
+
+      // Return experiment with related variant data
+      return {
+        ...experiment,
+        controlVariant: controlVariant ? {
+          id: controlVariant.id,
+          daytonaSandboxId: controlVariant.daytonaSandboxId,
+          publicUrl: controlVariant.publicUrl,
+          type: controlVariant.type,
+        } : null,
+        experimentalVariants: experimentalVariants.map((v) => ({
+          id: v.id,
+          description: v.suggestion, // Use suggestion field for screenshot URLs
+        })),
+      };
     },
     {
       params: t.Object({

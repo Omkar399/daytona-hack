@@ -22,9 +22,12 @@ export function ExperimentForm({ formData, onFormDataChange, onSubmit, onCancel,
   return (
     <Card className="max-w-2xl mx-auto border-2">
       <CardHeader>
-        <CardTitle className="text-2xl">New Experiment Configuration</CardTitle>
+        <CardTitle className="text-2xl flex items-center gap-2">
+          <RiFlaskLine className="h-6 w-6" />
+          New DevRel Flow
+        </CardTitle>
         <CardDescription className="text-base">
-          Configure your experiment parameters to get started
+          Automatically test and showcase new features with automated browser testing and social media posts
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -45,7 +48,7 @@ export function ExperimentForm({ formData, onFormDataChange, onSubmit, onCancel,
               className="h-11"
             />
             <p className="text-sm text-muted-foreground">
-              Source code for the application to be optimized
+              Your application repository. Triggered automatically by GitHub webhooks when PRs are merged.
             </p>
           </div>
 
@@ -53,18 +56,35 @@ export function ExperimentForm({ formData, onFormDataChange, onSubmit, onCancel,
           <div className="space-y-2">
             <Label htmlFor="goal" className="text-base font-semibold flex items-center gap-2">
               <RiTargetLine className="h-4 w-4" />
-              Task / Prompt
+              Description / Goal
             </Label>
             <Textarea
               id="goal"
-              placeholder="Describe what you want the AI to do... e.g., Increase signup conversion, Fix layout bugs, Improve user engagement"
+              placeholder="Describe your app or what you want to highlight... e.g., E-commerce platform with new color theme, Product showcase application"
               value={formData.goal}
               onChange={(e) => onFormDataChange({ ...formData, goal: e.target.value })}
               required
               className="min-h-[200px] resize-y"
             />
             <p className="text-sm text-muted-foreground">
-              Describe what you want the AI to optimize or improve
+              This helps the browser agent understand what to test and showcase
+            </p>
+          </div>
+
+          {/* Info Box */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-900">
+              <strong>How it works:</strong> When you merge a PR with CodeRabbit analysis, our DevRel agent will:
+              <br />
+              1️⃣ Extract new features from the PR analysis
+              <br />
+              2️⃣ Spawn a sandbox environment for your app
+              <br />
+              3️⃣ Use an AI browser agent to test the new features
+              <br />
+              4️⃣ Capture screenshots of the features in action
+              <br />
+              5️⃣ Generate an engaging social media post ready to share
             </p>
           </div>
 
@@ -72,7 +92,7 @@ export function ExperimentForm({ formData, onFormDataChange, onSubmit, onCancel,
           <div className="flex gap-3 pt-4">
             <Button type="submit" size="lg" className="flex-1 gap-2" disabled={isSubmitting}>
               <RiFlaskLine className="h-5 w-5" />
-              {isSubmitting ? "Starting..." : "Start Experiment"}
+              {isSubmitting ? "Starting..." : "Create DevRel Flow"}
             </Button>
             <Button
               type="button"

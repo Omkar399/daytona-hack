@@ -1,14 +1,17 @@
-import { RiFlaskLine } from "@remixicon/react";
+import { RiFlaskLine, RiRobot2Line } from "@remixicon/react";
 
 export function ExperimentHeader() {
   return (
     <div className="mb-8">
       <div className="flex items-center gap-3 mb-2">
-        <RiFlaskLine className="h-8 w-8 text-primary" />
-        <h1 className="text-4xl font-bold tracking-tight">Experiment Dashboard</h1>
+        <div className="flex items-center gap-2">
+          <RiFlaskLine className="h-8 w-8 text-blue-600" />
+          <RiRobot2Line className="h-8 w-8 text-blue-600" />
+        </div>
+        <h1 className="text-4xl font-bold tracking-tight">DevRel Automation</h1>
       </div>
       <p className="text-muted-foreground text-lg">
-        Self-improving A/B testing system powered by AI
+        Automated feature testing and social media content generation with AI browser agents
       </p>
     </div>
   );
