@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent } from '@/components/ui/card';
 import {
   RiTimeLine,
@@ -7,6 +9,7 @@ import {
   RiFlaskLine,
 } from '@remixicon/react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 interface ExperimentListCardProps {
   experiment: {
@@ -61,9 +64,15 @@ export const ExperimentListCard = ({ experiment }: ExperimentListCardProps) => {
   };
 
   return (
-    <Link href={`/experiments/${experiment.id}`}>
-      <Card className="hover:border-neutral-400 transition-colors cursor-pointer group">
-        <CardContent className="py-4">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.01 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Link href={`/experiments/${experiment.id}`}>
+        <Card className="hover:border-blue-400 transition-all cursor-pointer group hover-lift glass-dark border-neutral-700/50">
+          <CardContent className="py-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
@@ -89,9 +98,10 @@ export const ExperimentListCard = ({ experiment }: ExperimentListCardProps) => {
             <div className="flex items-center gap-1 text-neutral-400 group-hover:text-neutral-900 transition-colors">
               <RiArrowRightLine size={16} className="group-hover:translate-x-0.5 transition-transform" />
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
+    </motion.div>
   );
 };
