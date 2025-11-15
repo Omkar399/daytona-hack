@@ -54,7 +54,7 @@ export const SandboxCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="hover-lift glass-dark border-neutral-700/50">
+      <Card className="hover-lift glass-card border-neutral-200 dark:border-neutral-700/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <RiServerLine size={20} />

@@ -17,7 +17,7 @@ export function WelcomeCard({ onNewExperiment }: WelcomeCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <Card className="border-2 hover-lift glass-dark border-neutral-700/50">
+      <Card className="border-2 hover-lift glass-card border-neutral-200 dark:border-neutral-700/50">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
             <RiFlaskLine className="h-6 w-6" />
@@ -43,7 +43,7 @@ export function WelcomeCard({ onNewExperiment }: WelcomeCardProps) {
               transition={{ duration: 0.4, delay: item.delay }}
               className="flex gap-3 glass p-3 rounded-lg hover-lift"
             >
-              <item.icon className="h-5 w-5 text-blue-500 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <item.icon className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
                 <p className="font-semibold text-neutral-900 dark:text-neutral-100">{item.title}</p>
                 <p className="text-neutral-600 dark:text-neutral-400">{item.desc}</p>

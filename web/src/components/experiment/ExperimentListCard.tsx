@@ -71,7 +71,7 @@ export const ExperimentListCard = ({ experiment }: ExperimentListCardProps) => {
       transition={{ duration: 0.2 }}
     >
       <Link href={`/experiments/${experiment.id}`}>
-        <Card className="hover:border-blue-400 transition-all cursor-pointer group hover-lift glass-dark border-neutral-700/50">
+        <Card className="hover:border-blue-400 transition-all cursor-pointer group hover-lift glass-card border-neutral-200 dark:border-neutral-700/50">
           <CardContent className="py-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">

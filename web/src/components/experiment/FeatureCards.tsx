@@ -35,10 +35,10 @@ export function FeatureCards() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: feature.delay }}
         >
-          <Card className="hover-lift glass-dark border-neutral-700/50 h-full">
+          <Card className="hover-lift glass-card border-neutral-200 dark:border-neutral-700/50 h-full">
             <CardHeader>
-              <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3">
-                <feature.icon className="h-6 w-6 text-blue-500" />
+              <div className="w-12 h-12 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center mb-3">
+                <feature.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <CardTitle className="text-lg">{feature.title}</CardTitle>
               <CardDescription>
