@@ -12,6 +12,7 @@ export const experimentsTable = pgTable('experiments', {
     .notNull()
     .default('pending'),
   variantSuggestions: jsonb('variant_suggestions').$type<string[]>(),
+  selectedScreenshotUrls: jsonb('selected_screenshot_urls').$type<string[]>(),
   postApprovalStatus: text('post_approval_status')
     .$type<'pending' | 'approved' | 'rejected' | 'posted'>()
     .default('pending'),

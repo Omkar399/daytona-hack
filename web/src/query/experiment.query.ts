@@ -10,6 +10,9 @@ interface Experiment {
   createdAt: string;
   updatedAt: string;
   variantSuggestions?: string[];
+  selectedScreenshotUrls?: string[];
+  postApprovalStatus?: 'pending' | 'approved' | 'rejected' | 'posted';
+  postedToXAt?: string;
   controlVariant?: {
     id: string;
     daytonaSandboxId: string;
@@ -99,6 +102,58 @@ export const useStartExperimentMutation = () => {
 
   return {
     startExperiment: mutation.mutateAsync,
+    ...mutation,
+  };
+};
+
+export const useApprovePostMutation = () => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: ({ experimentId, approved }: { experimentId: string; approved: boolean }) => {
+      return API_CLIENT.fetch(`/experiment/${experimentId}/approve-post`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ approved }),
+      }) as Promise<{ success: boolean; message: string; status: string }>;
+    },
+    onSuccess: (_, variables) => {
+      // Invalidate experiment detail query to refetch updated status
+      queryClient.invalidateQueries({ queryKey: ['experiment', variables.experimentId] });
+      queryClient.invalidateQueries({ queryKey: ['experiments'] });
+    },
+  });
+
+  return {
+    approvePost: mutation.mutateAsync,
+    ...mutation,
+  };
+};
+
+export const useRegeneratePostMutation = () => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: ({ experimentId, selectedScreenshotUrls }: { experimentId: string; selectedScreenshotUrls: string[] }) => {
+      return API_CLIENT.fetch(`/experiment/${experimentId}/regenerate-post`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ selectedScreenshotUrls }),
+      }) as Promise<{ success: boolean; message: string; post: { content: string; hashtags: string[] } }>;
+    },
+    onSuccess: (_, variables) => {
+      // Invalidate experiment detail query to refetch updated post
+      queryClient.invalidateQueries({ queryKey: ['experiment', variables.experimentId] });
+      queryClient.invalidateQueries({ queryKey: ['experiments'] });
+    },
+  });
+
+  return {
+    regeneratePost: mutation.mutateAsync,
     ...mutation,
   };
 };

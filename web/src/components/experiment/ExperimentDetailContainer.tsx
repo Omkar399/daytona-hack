@@ -1,6 +1,6 @@
 'use client';
 
-import { useExperimentDetailQuery } from '@/query/experiment.query';
+import { useExperimentDetailQuery, useApprovePostMutation, useRegeneratePostMutation } from '@/query/experiment.query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { SandboxCard } from './DevRel/SandboxCard';
 import { BrowserTaskCard } from './DevRel/BrowserTaskCard';
 import { ScreenshotsCard } from './DevRel/ScreenshotsCard';
+import { ScreenshotSelectorCard } from './DevRel/ScreenshotSelectorCard';
 import { SocialPostCard } from './DevRel/SocialPostCard';
 
 interface ExperimentDetailContainerProps {
@@ -21,6 +22,39 @@ interface ExperimentDetailContainerProps {
 
 export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailContainerProps) => {
   const { experiment, isLoading, isError } = useExperimentDetailQuery(experimentId);
+  const { approvePost, isPending: isPosting } = useApprovePostMutation();
+  const { regeneratePost, isPending: isRegenerating } = useRegeneratePostMutation();
+
+  const handlePostToTwitter = async () => {
+    if (!experimentId) return;
+    
+    try {
+      await approvePost({ experimentId, approved: true });
+    } catch (error) {
+      console.error('Failed to post to Twitter:', error);
+    }
+  };
+
+  const handleRegeneratePost = async (selectedScreenshots: Array<{ url: string; description?: string }>) => {
+    if (!experimentId) return;
+    
+    try {
+      await regeneratePost({
+        experimentId,
+        selectedScreenshotUrls: selectedScreenshots.map((s) => s.url),
+      });
+    } catch (error) {
+      console.error('Failed to regenerate post:', error);
+    }
+  };
+
+  // Extract screenshots from experimentalVariants
+  const screenshots = experiment?.experimentalVariants?.map((v: any, idx: number) => ({
+    url: v.description || '',
+    description: v.description || `Screenshot ${idx + 1}`,
+    step: idx + 1,
+    id: v.id || idx.toString(),
+  })) || [];
 
   if (isLoading) {
     return (
@@ -159,22 +193,50 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
             <div className="mb-4">
               <ScreenshotsCard
                 status={experiment.status === 'completed' ? 'completed' : 'pending'}
-                screenshots={experiment.experimentalVariants?.map((v: any, idx) => ({
-                  url: v.description || '',
-                  description: `Variant ${idx + 1}`,
-                  step: idx + 1,
-                })) || []}
-                totalCount={experiment.experimentalVariants?.length || 0}
+                screenshots={screenshots}
+                totalCount={screenshots.length}
               />
             </div>
+
+            {/* Step 3.5: Screenshot Selector (only show if screenshots exist and post is ready) */}
+            {screenshots.length > 0 && experiment.variantSuggestions && experiment.variantSuggestions.length > 0 && (
+              <div className="mb-4">
+                <ScreenshotSelectorCard
+                  screenshots={screenshots}
+                  selectedScreenshotIds={
+                    experiment.selectedScreenshotUrls
+                      ? screenshots
+                          .map((s, idx) => (experiment.selectedScreenshotUrls?.includes(s.url) ? idx.toString() : null))
+                          .filter((id): id is string => id !== null)
+                      : undefined
+                  }
+                  onRegeneratePost={handleRegeneratePost}
+                  isRegenerating={isRegenerating}
+                />
+              </div>
+            )}
 
             {/* Step 4: Social Post */}
             <div>
               <SocialPostCard
-                status={experiment.status === 'completed' ? 'completed' : 'pending'}
+                status={
+                  experiment.postApprovalStatus === 'posted' 
+                    ? 'completed' 
+                    : experiment.postApprovalStatus === 'approved' 
+                    ? 'completed'
+                    : experiment.variantSuggestions && experiment.variantSuggestions.length > 0
+                    ? 'completed'
+                    : experiment.status === 'completed'
+                    ? 'generating'
+                    : 'pending'
+                }
                 postContent={experiment.variantSuggestions?.[0]}
                 hashtags={['#devrel', '#automation', '#featurelaunch']}
                 platform="all"
+                experimentId={experimentId}
+                postApprovalStatus={experiment.postApprovalStatus}
+                onPostToTwitter={handlePostToTwitter}
+                isPosting={isPosting}
               />
             </div>
           </div>

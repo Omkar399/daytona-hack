@@ -1,9 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   RiShareForwardLine,
   RiCheckboxCircleLine,
   RiLoader4Line,
   RiFileCopyLine,
+  RiTwitterXFill,
 } from '@remixicon/react';
 import { useState } from 'react';
 
@@ -12,6 +14,10 @@ interface SocialPostCardProps {
   postContent?: string;
   hashtags?: string[];
   platform?: 'twitter' | 'linkedin' | 'all';
+  experimentId?: string;
+  postApprovalStatus?: 'pending' | 'approved' | 'rejected' | 'posted';
+  onPostToTwitter?: () => void;
+  isPosting?: boolean;
 }
 
 export const SocialPostCard = ({
@@ -19,6 +25,10 @@ export const SocialPostCard = ({
   postContent,
   hashtags = [],
   platform = 'all',
+  experimentId,
+  postApprovalStatus,
+  onPostToTwitter,
+  isPosting = false,
 }: SocialPostCardProps) => {
   const [copied, setCopied] = useState(false);
 
@@ -119,12 +129,62 @@ export const SocialPostCard = ({
               </div>
             )}
 
-            <div className="pt-2 bg-green-50 border border-green-200 rounded p-3">
-              <p className="text-xs text-green-700">
-                ✓ Post is ready to share! Copy the content above and post to your social media
-                channels.
-              </p>
-            </div>
+            {/* Post to Twitter Button */}
+            {postApprovalStatus !== 'posted' && postApprovalStatus !== 'approved' && (
+              <div className="pt-3 border-t">
+                <Button
+                  onClick={onPostToTwitter}
+                  disabled={isPosting || !experimentId}
+                  className="w-full bg-black hover:bg-gray-800 text-white"
+                >
+                  {isPosting ? (
+                    <>
+                      <RiLoader4Line size={16} className="mr-2 animate-spin" />
+                      Posting to Twitter...
+                    </>
+                  ) : (
+                    <>
+                      <RiTwitterXFill size={16} className="mr-2" />
+                      Post to Twitter / X
+                    </>
+                  )}
+                </Button>
+                <p className="text-xs text-neutral-500 mt-2 text-center">
+                  This will automatically post to your Twitter/X account using browser automation
+                </p>
+              </div>
+            )}
+
+            {/* Posted Status */}
+            {postApprovalStatus === 'posted' && (
+              <div className="pt-3 border-t bg-green-50 border border-green-200 rounded p-3">
+                <div className="flex items-center gap-2">
+                  <RiCheckboxCircleLine size={16} className="text-green-600" />
+                  <p className="text-sm text-green-700 font-medium">
+                    ✓ Posted to Twitter / X successfully!
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {postApprovalStatus === 'approved' && (
+              <div className="pt-3 border-t bg-blue-50 border border-blue-200 rounded p-3">
+                <div className="flex items-center gap-2">
+                  <RiLoader4Line size={16} className="text-blue-600 animate-spin" />
+                  <p className="text-sm text-blue-700 font-medium">
+                    Posting to Twitter / X in progress...
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {postApprovalStatus !== 'posted' && postApprovalStatus !== 'approved' && (
+              <div className="pt-2 bg-green-50 border border-green-200 rounded p-3">
+                <p className="text-xs text-green-700">
+                  ✓ Post is ready to share! Copy the content above or post directly to Twitter.
+                </p>
+              </div>
+            )}
           </div>
         )}
 

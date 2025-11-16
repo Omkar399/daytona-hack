@@ -9,12 +9,41 @@ export abstract class BrowserService {
    * @returns The created task with ID and live URL
    */
   static async createTask(task: string, url?: string) {
-    const taskData = await browserUse.tasks.createTask({
-      task,
-      startUrl: url,
-    });
+    try {
+      const taskData = await browserUse.tasks.createTask({
+        task,
+        startUrl: url,
+      });
 
-    return taskData;
+      console.log('📋 Browser task creation response:', JSON.stringify(taskData, null, 2));
+
+      // Check if task has an id field
+      if (!taskData || (!taskData.id && !(taskData as any).taskId && !(taskData as any).task_id)) {
+        console.error('❌ Task creation response missing ID:', taskData);
+        throw new Error('Task creation failed: No task ID returned');
+      }
+
+      // Normalize the ID field (handle different possible field names)
+      const taskId = taskData.id || (taskData as any).taskId || (taskData as any).task_id;
+      
+      if (!taskId) {
+        throw new Error('Task creation failed: Could not extract task ID from response');
+      }
+
+      // Return normalized task data with id field
+      return {
+        ...taskData,
+        id: taskId,
+      };
+    } catch (error: any) {
+      console.error('❌ Error creating browser task:', error);
+      console.error('   Error details:', error.message);
+      if (error.response) {
+        console.error('   Response status:', error.response.status);
+        console.error('   Response body:', error.response.data);
+      }
+      throw error;
+    }
   }
 
   /**
@@ -27,11 +56,22 @@ export abstract class BrowserService {
     taskId: string,
     maxWaitTime: number = 5 * 60 * 1000
   ) {
+    // Validate taskId is a valid UUID
+    if (!taskId || taskId === 'undefined' || typeof taskId !== 'string') {
+      throw new Error(`Invalid taskId: ${taskId}. Expected a valid UUID string.`);
+    }
+
+    // Basic UUID format validation
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(taskId)) {
+      throw new Error(`Invalid taskId format: ${taskId}. Expected UUID format.`);
+    }
+
     const startTime = Date.now();
     const pollInterval = 3000; // Poll every 3 seconds
 
     while (Date.now() - startTime < maxWaitTime) {
-      const task = await browserUse.tasks.getTask({ task_id: taskId });
+      const task = await browserUse.tasks.getTask(taskId);
 
       if (task?.status === 'finished' || task?.status === 'stopped') {
         return task;
@@ -50,7 +90,12 @@ export abstract class BrowserService {
    * @returns
    */
   static async getTaskSteps(taskId: string): Promise<TaskStepView[]> {
-    const task = await browserUse.tasks.getTask({ task_id: taskId });
+    // Validate taskId
+    if (!taskId || taskId === 'undefined' || typeof taskId !== 'string') {
+      throw new Error(`Invalid taskId: ${taskId}. Expected a valid UUID string.`);
+    }
+
+    const task = await browserUse.tasks.getTask(taskId);
     return task?.steps ?? [];
   }
 
@@ -60,7 +105,12 @@ export abstract class BrowserService {
    * @returns raw txt file with the full task logs and thinking process
    */
   static async getTaskLogs(taskId: string) {
-    const { downloadUrl } = await browserUse.tasks.getTaskLogs({ task_id: taskId });
+    // Validate taskId
+    if (!taskId || taskId === 'undefined' || typeof taskId !== 'string') {
+      throw new Error(`Invalid taskId: ${taskId}. Expected a valid UUID string.`);
+    }
+
+    const { downloadUrl } = await browserUse.tasks.getTaskLogs(taskId);
     const response = await fetch(downloadUrl);
     const text = await response.text();
     return text;

@@ -251,6 +251,82 @@ export const experimentRoutes = new Elysia({ prefix: '/experiment' })
         approved: t.Boolean(),
       }),
     }
+  )
+  .post(
+    '/:id/regenerate-post',
+    async ({ params, body }) => {
+      const experimentId = params.id as Id<'experiment'>;
+      const { selectedScreenshotUrls } = body;
+
+      console.log(`🔄 Regenerating post for experiment ${experimentId} with ${selectedScreenshotUrls?.length || 0} screenshots`);
+
+      // Get the experiment
+      const experiments = await db
+        .select()
+        .from(experimentsTable)
+        .where(eq(experimentsTable.id, experimentId))
+        .limit(1);
+
+      if (experiments.length === 0) {
+        return { success: false, message: 'Experiment not found' };
+      }
+
+      const experiment = experiments[0];
+
+      // Get screenshot descriptions from variants
+      const { variantsTable } = await import('@/db/variant.db');
+      const variants = await db
+        .select()
+        .from(variantsTable)
+        .where(eq(variantsTable.experimentId, experimentId));
+
+      // Map URLs to screenshot objects with descriptions
+      const selectedScreenshots = selectedScreenshotUrls.map((url: string) => {
+        const variant = variants.find((v) => v.suggestion === url);
+        return {
+          url,
+          description: (variant?.analysis as any)?.summary || 'Feature screenshot',
+        };
+      });
+
+      // Regenerate post with selected screenshots
+      const { AiService } = await import('@/service/ai/Ai.service');
+      const post = await AiService.generateSocialMediaPost({
+        title: experiment.goal,
+        summary: experiment.goal,
+        screenshots: selectedScreenshots,
+      });
+
+      // Update experiment with new post and selected screenshots
+      await db
+        .update(experimentsTable)
+        .set({
+          variantSuggestions: [post.content],
+          selectedScreenshotUrls: selectedScreenshotUrls, // Store selected screenshots
+          postApprovalStatus: 'pending', // Reset approval status
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(experimentsTable.id, experimentId));
+
+      console.log(`✅ Post regenerated with ${selectedScreenshots.length} screenshots`);
+
+      return {
+        success: true,
+        message: 'Post regenerated successfully',
+        post: {
+          content: post.content,
+          hashtags: post.hashtags,
+        },
+      };
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      body: t.Object({
+        selectedScreenshotUrls: t.Array(t.String()),
+      }),
+    }
   );
 
 export abstract class ExperimentService {
