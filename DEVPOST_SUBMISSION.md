@@ -1,6 +1,6 @@
-# AXIOM - Autonomous UX Experimentation Platform
+# AXIOM - AI-Powered DevRel Automation
 
-> AI agents that find UX problems, write code to fix them, and test the results - automatically.
+> Turn every PR merge into engaging social media content - automatically.
 
 **Built for:** Daytona Hacksprint 2025
 
@@ -8,118 +8,177 @@
 
 ## <img src="https://img.icons8.com/ios-filled/50/000000/goal.png" alt="Target" width="28"/> Inspiration
 
-Every product team knows the pain: you ship a feature, suspect users are struggling, but testing takes **weeks**. Traditional A/B testing requires:
-- <img src="https://img.icons8.com/fluent/48/clock.png" alt="Clock" width="20"/> Manual variant creation (3-5 days)
-- <img src="https://img.icons8.com/fluent/48/laptop.png" alt="Laptop" width="20"/> Developer time for implementation (1-2 weeks)  
-- <img src="https://img.icons8.com/fluent/48/test-tube.png" alt="Test" width="20"/> Testing and analysis (3-7 days)
+Every Developer Relations team faces the same challenge: **You ship amazing features, but creating social media content takes hours.**
 
-We wondered: **What if AI could do all of this autonomously?**
+The manual process is exhausting:
+- <img src="https://img.icons8.com/fluent/48/code.png" alt="Code" width="20"/> PR gets merged → Code ships to production
+- <img src="https://img.icons8.com/fluent/48/clock.png" alt="Clock" width="20"/> DevRel team manually reviews changes (1-2 hours)
+- <img src="https://img.icons8.com/fluent/48/laptop.png" alt="Laptop" width="20"/> Spin up the app to take screenshots (30-60 minutes)
+- <img src="https://img.icons8.com/fluent/48/camera.png" alt="Camera" width="20"/> Manually capture screenshots of new features (30 minutes)
+- <img src="https://img.icons8.com/fluent/48/edit.png" alt="Edit" width="20"/> Write engaging social media posts (30-60 minutes)
+- <img src="https://img.icons8.com/fluent/48/twitter.png" alt="Twitter" width="20"/> Post to Twitter/LinkedIn manually
 
-What if you could describe a UX problem and watch as AI:
-- <img src="https://img.icons8.com/fluent/48/search.png" alt="Search" width="20"/> Explores your site like a real user
-- <img src="https://img.icons8.com/fluent/48/innovation.png" alt="Innovation" width="20"/> Generates improvement ideas
-- <img src="https://img.icons8.com/fluent/48/code.png" alt="Code" width="20"/> Writes the code to implement fixes
-- <img src="https://img.icons8.com/fluent/48/test-tube.png" alt="Test" width="20"/> Tests every variant in parallel
-- <img src="https://img.icons8.com/fluent/48/bar-chart.png" alt="Chart" width="20"/> Shows you which solution works best
+**Total time: 3-5 hours per feature release** 😰
 
-**All in minutes, not weeks.**
+We wondered: **What if AI could do ALL of this automatically when a PR merges?**
 
-That's why we built **AXIOM** - the world's first fully autonomous UX experimentation platform.
+That's why we built **AXIOM** - the world's first fully autonomous DevRel content generation platform.
 
 ---
 
 ## <img src="https://img.icons8.com/fluent/50/innovation.png" alt="Innovation" width="28"/> What it does
 
-AXIOM is an **AI-powered A/B testing platform** that revolutionizes how teams optimize user experience:
+AXIOM is an **AI-powered DevRel automation platform** that turns every GitHub PR merge into ready-to-post social media content:
 
-### <img src="https://img.icons8.com/fluent/48/rocket.png" alt="Rocket" width="24"/> Give it two things:
-1. **GitHub repository URL**
-2. **UX problem description** (e.g., "Users can't find products easily")
+### <img src="https://img.icons8.com/fluent/48/workflow.png" alt="Workflow" width="24"/> The Complete Automation
 
-### <img src="https://img.icons8.com/fluent/48/lightning-bolt.png" alt="Lightning" width="24"/> Watch it work its magic:
+**When you merge a PR, AXIOM automatically:**
 
-**<img src="https://img.icons8.com/fluent/48/search.png" alt="Search" width="22"/> 1. Find Problems**
-- Browser-use agents explore your site like real users
-- Click, scroll, search naturally (not rigid scripts)
-- Document friction points and UX issues
-- Capture screenshots at every step
+**<img src="https://img.icons8.com/fluent/48/webhook.png" alt="Webhook" width="22"/> 1. Detects the Merge**
+- GitHub webhook triggers instantly on PR merge
+- Extracts PR title, description, and CodeRabbit AI summary
+- Identifies what features/changes were added
 
-**<img src="https://img.icons8.com/fluent/48/innovation.png" alt="Innovation" width="22"/> 2. Generate Solutions**
-- AI analyzes the problems found
-- Creates 3-5 concrete improvement suggestions
-- Each suggestion is specific and implementable
+**<img src="https://img.icons8.com/fluent/48/cloud.png" alt="Cloud" width="22"/> 2. Spins Up Live Demo**
+- Creates isolated Daytona sandbox with merged code
+- Clones repository and installs dependencies
+- Starts development server with your latest changes
+- Gets public preview URL for testing
 
-**<img src="https://img.icons8.com/fluent/48/code.png" alt="Code" width="22"/> 3. Implement Fixes Autonomously**
-- Creates isolated Daytona sandbox for each variant
-- Claude Code agents read your codebase
-- Make surgical code changes to implement improvements
-- Track every file modified and change made
+**<img src="https://img.icons8.com/fluent/48/bot.png" alt="Bot" width="22"/> 3. Demonstrates New Features**
+- AI analyzes CodeRabbit summary to identify key changes
+- Browser-use agents explore your app like real users
+- Agents naturally interact with new features (click, scroll, navigate)
+- Captures what changed and how users will experience it
 
-**<img src="https://img.icons8.com/fluent/48/test-tube.png" alt="Test" width="22"/> 4. Test Everything in Parallel**
-- Browser agents test each variant automatically
-- Compare results against control
-- Extract insights and success metrics
-- Identify winning solutions
+**<img src="https://img.icons8.com/fluent/48/camera.png" alt="Camera" width="22"/> 4. Captures Professional Screenshots**
+- Takes screenshots at each interaction step
+- Shows new features in action
+- Captures user flows and visual changes
+- Collects multiple angles for best presentation
 
-**<img src="https://img.icons8.com/fluent/48/bar-chart.png" alt="Chart" width="22"/> 5. Present Results**
-- Live preview URLs for every variant
-- Side-by-side comparison
-- UX insights for each variant
-- Clear recommendation for deployment
+**<img src="https://img.icons8.com/fluent/48/artificial-intelligence.png" alt="AI" width="22"/> 5. Generates Social Media Posts**
+- Google Gemini AI creates engaging post copy
+- Tailored versions for Twitter (280 chars) AND LinkedIn (detailed)
+- Includes relevant hashtags and call-to-action
+- References screenshots automatically
 
-### <img src="https://img.icons8.com/fluent/48/clock.png" alt="Clock" width="24"/> The Result: 
-**Traditional A/B testing: 2-4 weeks**  
-**AXIOM: 5-10 minutes**
+**<img src="https://img.icons8.com/fluent/48/dashboard.png" alt="Dashboard" width="22"/> 6. Presents Everything in Dashboard**
+- Beautiful UI showing all generated content
+- Screenshot gallery ready to download
+- Copy Twitter + LinkedIn posts with one click
+- Live demo link to share
+
+### <img src="https://img.icons8.com/fluent/48/lightning-bolt.png" alt="Lightning" width="24"/> The Result: 
+
+**Manual Process: 3-5 hours per feature**  
+**AXIOM: 3-5 minutes, fully automated**  
+**That's a 95% time reduction!** 🚀
 
 ---
 
 ## <img src="https://img.icons8.com/fluent/50/engineering.png" alt="Build" width="28"/> How we built it
 
-### <img src="https://img.icons8.com/fluent/48/artificial-intelligence.png" alt="AI" width="24"/> Three-Agent Architecture
+### <img src="https://img.icons8.com/fluent/48/workflow.png" alt="Workflow" width="24"/> Complete Workflow
 
-We orchestrated three powerful AI systems to work together seamlessly:
-
-**1. <img src="https://img.icons8.com/fluent/48/web.png" alt="Browser" width="20"/> Browser-use Agent** (Problem Discovery)
 ```
-Role: Real User Simulator
-- Explores site with natural user behavior
-- Documents UX friction points
-- Captures visual evidence
-- Provides detailed interaction logs
-```
-
-**2. <img src="https://img.icons8.com/fluent/48/cloud.png" alt="Cloud" width="20"/> Daytona** (Isolation Layer)
-```
-Role: Parallel Environment Manager
-- Creates isolated cloud sandboxes
-- Clones repositories per variant
-- Manages development servers
-- Provides public preview URLs
-```
-
-**3. <img src="https://img.icons8.com/fluent/48/bot.png" alt="Robot" width="20"/> Claude Code Agent** (Solution Implementation)
-```
-Role: Autonomous Code Writer
-- Reads entire codebase
-- Implements UX improvements
-- Makes targeted surgical changes
-- Reports modifications back
+┌─────────────────────────────────────────────────┐
+│  GitHub PR Merged                               │
+│  (CodeRabbit analyzes changes)                  │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│  GitHub Webhook → Triggers /from-webhook        │
+│  Payload: PR title, body, CodeRabbit summary    │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│  AXIOM Backend: Create Experiment               │
+│  • Parse PR data and CodeRabbit summary         │
+│  • Store experiment in database                 │
+│  • Trigger Inngest job for processing           │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│  Step 1: Create Daytona Sandbox                 │
+│  • Clone repository with merged changes         │
+│  • Install dependencies (npm/pnpm/yarn)         │
+│  • Start dev server with PM2                    │
+│  • Get public preview URL                       │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│  Step 2: Extract Features (Gemini AI)           │
+│  • Feed CodeRabbit summary to AI                │
+│  • Identify user-facing changes                 │
+│  • Extract key features to demonstrate          │
+│  • Example: ["Dark mode toggle", "Search bar"]  │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│  Step 3: Generate Browser Task (Gemini AI)      │
+│  • AI creates exploration prompt                │
+│  • Focuses on demonstrating new features        │
+│  • Natural language instructions                │
+│  • Example: "Explore the new dark mode..."      │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│  Step 4: Run Browser Agent (Browser-use)        │
+│  • Browser-use agent visits preview URL         │
+│  • Autonomously explores and interacts          │
+│  • Demonstrates new features naturally          │
+│  • Captures screenshots at each step            │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│  Step 5: Collect Screenshots                    │
+│  • Extract screenshot URLs from browser steps   │
+│  • Attach descriptions to each image            │
+│  • Organize in chronological order              │
+│  • Store URLs for easy access                   │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│  Step 6: Generate Social Posts (Gemini AI)      │
+│  • Input: PR title, summary, screenshots        │
+│  • Generate Twitter post (280 char limit)       │
+│  • Generate LinkedIn post (detailed version)    │
+│  • Add relevant hashtags and CTA                │
+│  • Format with emojis and engagement hooks      │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│  Dashboard: Present Results                     │
+│  • Display Twitter + LinkedIn posts             │
+│  • Show screenshot gallery                      │
+│  • Provide live demo link                       │
+│  • Copy-to-clipboard for easy posting           │
+└─────────────────────────────────────────────────┘
 ```
 
 ### <img src="https://img.icons8.com/fluent/48/settings.png" alt="Tools" width="24"/> Tech Stack
 
 **Backend (API):**
 - <img src="https://img.icons8.com/fluent/24/bun.png" alt="Bun" width="18"/> **Bun** - Lightning-fast JavaScript runtime
-- <img src="https://img.icons8.com/fluent/24/lightning-bolt.png" alt="Fast" width="18"/> **Elysia** - Type-safe REST framework
+- <img src="https://img.icons8.com/fluent/24/lightning-bolt.png" alt="Fast" width="18"/> **Elysia** - Type-safe REST framework for Bun
 - <img src="https://img.icons8.com/fluent/24/database.png" alt="Database" width="18"/> **PostgreSQL** - Reliable data persistence
 - <img src="https://img.icons8.com/fluent/24/synchronize.png" alt="Sync" width="18"/> **Drizzle ORM** - Type-safe database queries
-- <img src="https://img.icons8.com/fluent/24/package.png" alt="Package" width="18"/> **Inngest** - Durable execution for long-running workflows
+- <img src="https://img.icons8.com/fluent/24/package.png" alt="Package" width="18"/> **Inngest** - Durable execution for multi-step workflows
 
 **AI/ML Services:**
-- <img src="https://img.icons8.com/fluent/24/brain.png" alt="AI" width="18"/> **Claude Code Agent SDK** - Autonomous code implementation
-- <img src="https://img.icons8.com/fluent/24/web.png" alt="Browser" width="18"/> **Browser-use SDK** - Natural browser automation
-- <img src="https://img.icons8.com/fluent/24/bot.png" alt="Bot" width="18"/> **Google Gemini 2.0** - Log analysis and insights
-- <img src="https://img.icons8.com/fluent/24/artificial-intelligence.png" alt="AI" width="18"/> **Anthropic Claude** - Intelligent code generation
+- <img src="https://img.icons8.com/fluent/24/bot.png" alt="Bot" width="18"/> **Google Gemini 2.0 Flash Lite** - Feature extraction, task generation, social post creation
+- <img src="https://img.icons8.com/fluent/24/web.png" alt="Browser" width="18"/> **Browser-use SDK** - Natural browser automation for feature demonstration
+- <img src="https://img.icons8.com/fluent/24/artificial-intelligence.png" alt="AI" width="18"/> **CodeRabbit AI** - Automatic PR summary generation (integrated via GitHub)
 - <img src="https://img.icons8.com/fluent/24/cloud.png" alt="Cloud" width="18"/> **Daytona SDK** - Cloud sandbox orchestration
 
 **Frontend:**
@@ -127,304 +186,243 @@ Role: Autonomous Code Writer
 - <img src="https://img.icons8.com/fluent/24/paint-palette.png" alt="Design" width="18"/> **Tailwind CSS 4** - Modern styling
 - <img src="https://img.icons8.com/fluent/24/animation.png" alt="Animation" width="18"/> **Framer Motion** - Smooth animations
 - <img src="https://img.icons8.com/fluent/24/template.png" alt="Components" width="18"/> **shadcn/ui** - Beautiful component library
-- <img src="https://img.icons8.com/fluent/24/bar-chart.png" alt="Data" width="18"/> **TanStack Query** - Powerful data synchronization
+- <img src="https://img.icons8.com/fluent/24/bar-chart.png" alt="Data" width="18"/> **TanStack Query** - Real-time data synchronization
 
 **Infrastructure:**
-- <img src="https://img.icons8.com/fluent/24/settings.png" alt="Settings" width="18"/> **PM2** - Process management in sandboxes
-- <img src="https://img.icons8.com/fluent/24/link.png" alt="Link" width="18"/> **GitHub Webhooks** - Automated DevRel workflows
-- <img src="https://img.icons8.com/fluent/24/rocket.png" alt="Deploy" width="18"/> **Express.js** - Webhook server
-
-### <img src="https://img.icons8.com/fluent/48/workflow.png" alt="Workflow" width="24"/> Complete Workflow Pipeline
-
-```
-┌─────────────────────────────────────────────────┐
-│  User Input: Repo URL + UX Problem             │
-└─────────────────┬───────────────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────────────┐
-│  PHASE 1: Create Control Variant               │
-│  • Daytona creates isolated sandbox            │
-│  • Clone repo, install dependencies            │
-│  • Start dev server with PM2                   │
-│  • Get public preview URL                      │
-└─────────────────┬───────────────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────────────┐
-│  PHASE 2: Discover Problems                    │
-│  • Browser agent explores site naturally       │
-│  • Document UX issues and friction             │
-│  • AI (Gemini) analyzes browser logs           │
-│  • Extract actionable insights                 │
-└─────────────────┬───────────────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────────────┐
-│  PHASE 3: Generate Solutions                   │
-│  • AI analyzes control variant results         │
-│  • Generate 3-5 specific improvements          │
-│  • Each suggestion is concrete & implementable │
-└─────────────────┬───────────────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────────────┐
-│  PHASE 4: Implement in Parallel (Per Variant)  │
-│  FOR EACH SUGGESTION:                          │
-│    1. Create new Daytona sandbox               │
-│    2. Clone repository                         │
-│    3. Spawn Claude Code agent                  │
-│    4. Agent implements improvement             │
-│    5. Start dev server                         │
-│    6. Get preview URL                          │
-│    7. Browser agent tests variant              │
-│  ALL VARIANTS RUN SIMULTANEOUSLY!              │
-└─────────────────┬───────────────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────────────┐
-│  PHASE 5: Compare & Recommend                  │
-│  • Compare all variants vs control             │
-│  • AI analyzes test results                    │
-│  • Calculate success metrics                   │
-│  • Present recommendations                     │
-│  • Show live previews                          │
-└─────────────────────────────────────────────────┘
-```
-
-### 🏛️ Architecture Highlights
-
-**Service-Oriented Design:**
-```
-api/src/
-├── lib/          # SDK clients (Daytona, Browser-use, Inngest)
-├── service/      # Business logic (Experiment, AI, Browser)
-├── db/           # Database entities & schemas
-└── index.ts      # Application entry point
-```
-
-**Durable Job Execution:**
-- Inngest manages complex multi-step workflows
-- Automatic retries on failures
-- State persistence across steps
-- Parallel job execution
-- Full observability
-
-**Database Schema:**
-- **Experiments** - Track UX testing sessions
-- **Variants** - Control and experimental versions
-- **Code Agents** - Claude Code implementation tracking
-- **Browser Agents** - Test execution records
+- <img src="https://img.icons8.com/fluent/24/settings.png" alt="Settings" width="18"/> **PM2** - Process management for dev servers in sandboxes
+- <img src="https://img.icons8.com/fluent/24/webhook.png" alt="Webhook" width="18"/> **Express.js** - GitHub webhook listener
+- <img src="https://img.icons8.com/fluent/24/github.png" alt="GitHub" width="18"/> **GitHub Webhooks** - PR merge detection
 
 ---
 
 ## <img src="https://img.icons8.com/fluent/50/problem.png" alt="Challenge" width="28"/> Challenges we ran into
 
-### 1. <img src="https://img.icons8.com/fluent/24/fire-element.png" alt="Fire" width="20"/> Daytona Process Management
-**Problem:** Dev servers need to run indefinitely in cloud sandboxes, but processes would die randomly.
+### 1. <img src="https://img.icons8.com/fluent/24/fire-element.png" alt="Fire" width="20"/> Keeping Dev Servers Alive in Sandboxes
 
-**Solution:** Integrated PM2 process manager into each Daytona sandbox:
+**Problem:** Development servers in Daytona sandboxes would randomly die, breaking the workflow.
+
+**Solution:** Integrated PM2 process manager into each sandbox:
 ```bash
 pm2 start npm --name "dev-server" -- run dev
-pm2 logs dev-server
+pm2 logs dev-server # Monitor in real-time
 ```
-This ensures dev servers stay alive and we can monitor them reliably.
+PM2 ensures dev servers stay alive indefinitely and provides automatic restarts if crashes occur.
 
 ---
 
-### 2. <img src="https://img.icons8.com/fluent/24/link.png" alt="Link" width="20"/> Claude Code Communication
-**Problem:** Claude Code agents run autonomously in sandboxes - how do they report results back?
+### 2. <img src="https://img.icons8.com/fluent/24/brain.png" alt="Brain" width="20"/> Extracting Relevant Features from CodeRabbit Summaries
 
-**Solution:** Built a webhook callback system:
-- Inject custom reporting script into Claude's workspace
-- Claude posts results to our API when done
-- Track implementation status in real-time
-- Full audit trail of every file modified
+**Problem:** CodeRabbit summaries contain lots of technical details - how do we identify user-facing features?
+
+**Solution:** Built AI-powered feature extraction:
+- Feed CodeRabbit summary to Gemini AI
+- Prompt specifically asks for "user-facing features" and "UI/UX changes"
+- Filters out internal refactoring and dependency updates
+- Returns clean list: `["Dark mode toggle", "Product search bar"]`
+
+**Key insight:** Be explicit in prompts about what to include/exclude.
 
 ---
 
-### 3. <img src="https://img.icons8.com/fluent/24/settings.png" alt="Settings" width="20"/> Parallel Job Orchestration
-**Problem:** Coordinating multiple async workflows (5+ sandboxes creating, testing, and reporting simultaneously)
+### 3. <img src="https://img.icons8.com/fluent/24/bot.png" alt="Bot" width="20"/> Natural Feature Demonstration with Browser Agents
 
-**Solution:** Leveraged Inngest's step functions:
+**Problem:** Rigid scripts don't show features naturally. How do we make agents explore like real users?
+
+**Solution:** Two-phase AI approach:
+1. **Gemini generates exploratory task** based on features identified
+2. **Browser-use agent executes** with natural, adaptive behavior
+
+Example task: "Explore the new dark mode feature. Try toggling it on and off, and browse different pages to see how it looks."
+
+Browser agent navigates naturally, not following rigid click-by-click instructions.
+
+---
+
+### 4. <img src="https://img.icons8.com/fluent/24/workflow.png" alt="Workflow" width="20"/> Coordinating Multi-Step Async Workflows
+
+**Problem:** Each experiment involves 6+ async steps - sandboxes, browser agents, AI calls, database updates.
+
+**Solution:** Leveraged Inngest's step functions for durable execution:
 ```typescript
 await step.run('create-sandbox', async () => {...})
-await step.run('spawn-agent', async () => {...})
-await step.run('test-variant', async () => {...})
+await step.run('extract-features', async () => {...})
+await step.run('run-browser-agent', async () => {...})
+await step.run('generate-social-post', async () => {...})
 ```
-Each step is durable, retryable, and properly sequenced.
+
+Benefits:
+- Each step is retryable if it fails
+- State persists across steps
+- Easy debugging with step-by-step logs
+- No manual orchestration code
 
 ---
 
-### 4. <img src="https://img.icons8.com/fluent/24/brain.png" alt="Brain" width="20"/> Browser Log Analysis
-**Problem:** Raw browser logs are massive, noisy, and unstructured (thousands of lines)
+### 5. <img src="https://img.icons8.com/fluent/24/twitter.png" alt="Twitter" width="20"/> Creating Engaging Social Media Copy
 
-**Solution:** Structured AI extraction with Gemini:
-- Feed logs + original goal to Gemini
-- Extract only actionable insights
-- Format as structured JSON
-- Filter out noise and focus on UX issues
+**Problem:** Generic AI posts sound robotic. How do we make posts engaging and authentic?
+
+**Solution:** Crafted detailed prompt with:
+- Tone guidance: "Enthusiastic, professional, friendly"
+- Character limits: "Under 280 chars for Twitter"
+- Structure requirements: "Value/benefit, excitement, CTA"
+- Examples of good vs. bad posts
+
+Result: Posts that sound human and drive engagement.
 
 ---
 
-### 5. <img src="https://img.icons8.com/fluent/24/clock.png" alt="Clock" width="20"/> Sandbox Creation Timeouts
-**Problem:** Daytona sandboxes sometimes timeout during creation under load
+### 6. <img src="https://img.icons8.com/fluent/24/clock.png" alt="Clock" width="20"/> Handling Webhook Duplicates
 
-**Solution:** Exponential backoff retry mechanism:
+**Problem:** GitHub sometimes sends duplicate webhook events, creating duplicate experiments.
+
+**Solution:** Deduplication check before creating experiments:
 ```typescript
-// Retry up to 3 times with increasing delays
-for (let i = 0; i < 3; i++) {
-  try {
-    return await daytona.create({...})
-  } catch (error) {
-    if (i < 2) await sleep(2 ** i * 1000)
-  }
+// Check if experiment already exists for this PR
+const existingExperiments = await db
+  .select()
+  .from(experimentsTable)
+  .where(eq(experimentsTable.repoUrl, repoUrl))
+  .limit(1);
+
+if (existingExperiments[0]?.goal === prTitle) {
+  return { message: 'Duplicate ignored' };
 }
 ```
 
 ---
 
-### 6. <img src="https://img.icons8.com/fluent/24/goal.png" alt="Target" width="20"/> Prompt Engineering for Accurate Results
-**Problem:** Generic prompts led to vague suggestions or incomplete implementations
-
-**Solution:** Crafted precise, context-rich prompts:
-- Include full repository structure
-- Specify exact file paths
-- Provide before/after examples
-- Request structured output format
-- Iterate based on agent feedback
-
----
-
 ## <img src="https://img.icons8.com/fluent/50/trophy.png" alt="Trophy" width="28"/> Accomplishments that we're proud of
 
-### <img src="https://img.icons8.com/fluent/24/star.png" alt="Star" width="20"/> First Fully Autonomous UX Testing Platform
-We successfully integrated **three complex SDKs** (Daytona, Claude Code, Browser-use) into a cohesive autonomous workflow. No other tool does end-to-end UX experimentation without human intervention.
+### <img src="https://img.icons8.com/fluent/24/star.png" alt="Star" width="20"/> First Fully Autonomous DevRel Content Generator
+
+We successfully built the **first end-to-end automated system** that goes from PR merge → social media posts with zero human intervention. No other tool automates the entire DevRel workflow.
 
 ---
 
-### <img src="https://img.icons8.com/fluent/24/lightning-bolt.png" alt="Lightning" width="20"/> 100x Speed Improvement
-**Before AXIOM:** 2-4 weeks for A/B testing  
-**With AXIOM:** 5-10 minutes  
-**That's a 200-300x time reduction!**
+### <img src="https://img.icons8.com/fluent/24/lightning-bolt.png" alt="Lightning" width="20"/> 95% Time Reduction for DevRel Teams
+
+**Before AXIOM:** 3-5 hours per feature announcement  
+**With AXIOM:** 3-5 minutes, fully automated  
+**Time saved:** 2.5-5 hours per release
+
+For teams shipping 2-3 features per week, that's **10-15 hours saved per week** = 40-60 hours/month!
 
 ---
 
-### <img src="https://img.icons8.com/fluent/24/goal.png" alt="Target" width="20"/> Production-Grade Architecture
-- Service-oriented design for scalability
+### <img src="https://img.icons8.com/fluent/24/artificial-intelligence.png" alt="AI" width="20"/> Four-AI Orchestration
+
+Successfully coordinated **four different AI systems** to work together seamlessly:
+1. **CodeRabbit AI** - PR analysis and summaries
+2. **Google Gemini** - Feature extraction, task generation, social posts
+3. **Browser-use** - Natural feature demonstration
+4. **Daytona** - Automated cloud sandbox provisioning
+
+---
+
+### <img src="https://img.icons8.com/fluent/24/workflow.png" alt="Workflow" width="20"/> Production-Ready Architecture
+
+Built with enterprise-grade practices:
 - Durable job execution (survives crashes)
-- Full type safety with TypeScript
+- Type-safe end-to-end (TypeScript + Drizzle)
 - Comprehensive error handling
 - Real-time progress tracking
-- Complete audit trails
+- Full audit trail
+- Webhook signature verification
+- Scalable service-oriented design
 
 ---
 
-### <img src="https://img.icons8.com/fluent/24/test-tube.png" alt="Test" width="20"/> Parallel Variant Testing
-Most tools test variants sequentially. AXIOM tests **5+ variants simultaneously** in isolated environments with zero interference.
+### <img src="https://img.icons8.com/fluent/24/camera.png" alt="Camera" width="20"/> Natural Feature Screenshots
+
+Browser agents capture screenshots that look like **real user sessions**, not synthetic test screenshots. They show features in context, with natural interactions.
 
 ---
 
-### <img src="https://img.icons8.com/fluent/24/bot.png" alt="Bot" width="20"/> Natural User Simulation
-Our browser agents don't follow rigid scripts - they explore naturally like real users:
-- Click around organically
-- Try different paths
-- Search and filter
-- Identify genuine friction points
+### <img src="https://img.icons8.com/fluent/24/twitter.png" alt="Twitter" width="20"/> Platform-Optimized Social Posts
 
-This provides **realistic UX insights**, not synthetic test data.
-
----
-
-### <img src="https://img.icons8.com/fluent/24/paint-palette.png" alt="Design" width="20"/> Beautiful, Modern UI
-Built a polished Next.js 15 frontend with:
-- Real-time experiment tracking
-- Live variant previews
-- Screenshot galleries
-- Smooth animations
-- Dark mode optimized
-- Responsive design
-
----
-
-### <img src="https://img.icons8.com/fluent/24/package.png" alt="Package" width="20"/> Bonus: DevRel Workflow
-Created automated feature announcement system:
-- Triggers on GitHub PR merge
-- Spins up demo sandbox
-- Browser agent demonstrates new features
-- Captures screenshots
-- Generates social media posts
-- Perfect for developer advocates!
+Generates **separate optimized versions** for each platform:
+- **Twitter:** Punchy, under 280 characters, exciting
+- **LinkedIn:** Detailed, professional, longer format
+- **Hashtags:** Relevant and engaging
+- **CTAs:** Clear call-to-action
 
 ---
 
 ## <img src="https://img.icons8.com/fluent/50/book.png" alt="Book" width="28"/> What we learned
 
-### <img src="https://img.icons8.com/fluent/24/brain.png" alt="Brain" width="20"/> AI Agent Orchestration is Hard
-Coordinating three different AI systems (Browser-use, Claude Code, Gemini) taught us:
-- Each SDK has unique behaviors and quirks
-- Prompt engineering is critical for accuracy
-- Error handling must be robust (agents can fail unpredictably)
-- Logging is essential for debugging autonomous systems
-- State management across agents requires careful design
+### <img src="https://img.icons8.com/fluent/24/artificial-intelligence.png" alt="AI" width="20"/> Multi-AI Orchestration Requires Careful Design
+
+Coordinating 4 different AI systems taught us:
+- Each AI has unique behaviors and latencies
+- Prompt engineering is **critical** for consistent outputs
+- Error handling must be robust (AI can fail unpredictably)
+- Structured outputs (JSON) improve reliability dramatically
+- Clear system boundaries prevent cascading failures
+
+**Lesson:** Treat AI systems like microservices - clear inputs/outputs, error boundaries, fallbacks.
 
 ---
 
-### <img src="https://img.icons8.com/fluent/24/cloud.png" alt="Cloud" width="20"/> Cloud Sandboxes Enable True Parallelism
-Daytona's isolated environments unlocked capabilities we couldn't achieve locally:
-- Spin up 10+ environments simultaneously
-- No resource conflicts
-- Public URLs for immediate testing
-- Clean slate for every variant
-- Easy cleanup after experiments
+### <img src="https://img.icons8.com/fluent/24/cloud.png" alt="Cloud" width="20"/> Cloud Sandboxes Are Essential for Automation
 
-**Lesson:** Infrastructure-as-code is the future of testing.
+Daytona's isolated environments were game-changing:
+- Spin up clean environments instantly
+- No local setup or configuration
+- Public URLs make testing seamless
+- True isolation prevents conflicts
+- Automatic cleanup after completion
+
+**Lesson:** Cloud development environments are the future of CI/CD and automation.
 
 ---
 
-### <img src="https://img.icons8.com/fluent/24/workflow.png" alt="Workflow" width="20"/> Durable Execution is a Game-Changer
-Inngest's step functions transformed our architecture:
-- No more worrying about crashes mid-workflow
-- Automatic retries on failures
+### <img src="https://img.icons8.com/fluent/24/workflow.png" alt="Workflow" width="20"/> Durable Execution Is Non-Negotiable
+
+Inngest's step functions transformed our reliability:
+- Workflows survive crashes and restarts
+- Automatic retries on transient failures
 - State persists across steps
-- Easy debugging with step-by-step logs
-- Parallel execution made simple
+- Easy debugging with step logs
+- No manual state management code
 
-**Lesson:** Long-running workflows need durable execution engines.
-
----
-
-### <img src="https://img.icons8.com/fluent/24/goal.png" alt="Target" width="20"/> Prompt Engineering > Model Size
-We learned that **well-crafted prompts** beat using larger models:
-- Gemini 2.0 Flash Lite (small, fast) with good prompts outperformed larger models with vague prompts
-- Context matters more than model capabilities
-- Structured output formats (JSON) improve reliability
-- Few-shot examples dramatically improve accuracy
-
-**Lesson:** Invest time in prompt engineering, not just model selection.
+**Lesson:** For complex workflows, use a durable execution engine from day one.
 
 ---
 
-### <img src="https://img.icons8.com/fluent/24/engineering.png" alt="Engineering" width="20"/> Service-Oriented Architecture Scales
-Separating concerns into services proved invaluable:
-- Easy to add new features
-- Services can evolve independently
-- Clear boundaries reduce bugs
-- Testing becomes straightforward
-- Multiple developers can work in parallel
+### <img src="https://img.icons8.com/fluent/24/goal.png" alt="Target" width="20"/> Prompt Engineering > Model Selection
 
-**Lesson:** Plan architecture early, even for hackathons.
+We discovered that **well-crafted prompts** matter more than model size:
+- Gemini 2.0 Flash Lite (small) with great prompts outperformed larger models with vague prompts
+- Context and examples are crucial
+- Structured outputs (JSON schemas) improve accuracy
+- Iterative refinement based on real outputs is essential
+
+**Lesson:** Invest time in prompt engineering, not just picking the latest/largest model.
 
 ---
 
-### <img src="https://img.icons8.com/fluent/24/user.png" alt="User" width="20"/> Real User Simulation > Synthetic Tests
-Natural browser automation provides insights that rigid scripts miss:
-- Agents discover unexpected UX issues
-- Behavior is more realistic
-- Results are more trustworthy
-- Users actually behave like our agents
+### <img src="https://img.icons8.com/fluent/24/bot.png" alt="Bot" width="20"/> Natural Automation Beats Rigid Scripts
 
-**Lesson:** AI-powered exploration beats pre-scripted tests.
+Browser-use's natural exploration provides better results than traditional automation:
+- Agents discover edge cases we didn't consider
+- Screenshots look authentic (like real users)
+- Demonstrations feel genuine, not robotic
+- Flexible to handle unexpected UI changes
+
+**Lesson:** AI-powered automation is more robust than hardcoded scripts.
+
+---
+
+### <img src="https://img.icons8.com/fluent/24/user.png" alt="User" width="20"/> DevRel Teams Need Better Tools
+
+Through building this, we realized:
+- DevRel is severely under-tooled (mostly manual work)
+- Content creation is repetitive and time-consuming
+- Teams want to focus on strategy, not screenshot capture
+- Automation can 10x DevRel productivity
+
+**Lesson:** There's huge opportunity in DevRel tooling and automation.
 
 ---
 
@@ -432,156 +430,142 @@ Natural browser automation provides insights that rigid scripts miss:
 
 ### <img src="https://img.icons8.com/fluent/24/goal.png" alt="Target" width="20"/> Short-term (Next 3 months)
 
-**<img src="https://img.icons8.com/fluent/20/merge-git.png" alt="Merge" width="16"/> Auto-Deploy Winning Variants**
-- Create GitHub PRs automatically for winning solutions
-- Include A/B test results in PR description
-- Auto-merge based on success thresholds
+**<img src="https://img.icons8.com/fluent/20/twitter.png" alt="Twitter" width="16"/> Direct Twitter/LinkedIn Posting**
+- Integrate Twitter API for automatic posting
+- LinkedIn API for company page updates
+- Schedule posts for optimal times
+- Track engagement metrics automatically
 
-**<img src="https://img.icons8.com/fluent/20/camera.png" alt="Camera" width="16"/> Visual Regression Testing**
-- Screenshot diffs before/after changes
-- Highlight visual changes for review
-- Catch unintended UI breaks
+**<img src="https://img.icons8.com/fluent/20/video.png" alt="Video" width="16"/> Video Demos Instead of Screenshots**
+- Record browser sessions as MP4 videos
+- Create GIF animations of key interactions
+- Auto-generate video with narration
+- Perfect for Twitter video posts
 
-**<img src="https://img.icons8.com/fluent/20/lightning-bolt.png" alt="Speed" width="16"/> Performance Metrics**
-- Track Core Web Vitals per variant
-- Measure load times
-- Monitor bundle sizes
-- Optimize winning variants
+**<img src="https://img.icons8.com/fluent/20/edit.png" alt="Edit" width="16"/> Custom Post Templates**
+- Let teams define their brand voice
+- Custom hashtag preferences
+- Company-specific formatting
+- Template library for different feature types
 
-**<img src="https://img.icons8.com/fluent/20/map.png" alt="Map" width="16"/> Multi-Page User Journeys**
-- Test complete user flows (homepage → product → checkout)
-- Identify drop-off points
-- Optimize entire funnels
+**<img src="https://img.icons8.com/fluent/20/bell.png" alt="Bell" width="16"/> Multi-Channel Distribution**
+- Slack notifications when content is ready
+- Discord integration
+- Email summaries
+- Webhook to custom systems
 
 ---
 
 ### <img src="https://img.icons8.com/fluent/24/goal.png" alt="Target" width="20"/> Medium-term (3-6 months)
 
-**<img src="https://img.icons8.com/fluent/20/bar-chart.png" alt="Chart" width="16"/> Real User Traffic Integration**
-- Connect to Google Analytics
-- A/B test with real users
-- Calculate statistical significance
-- Revenue impact analysis
+**<img src="https://img.icons8.com/fluent/20/bar-chart.png" alt="Chart" width="16"/> Analytics Dashboard**
+- Track post performance (likes, shares, comments)
+- A/B test different post styles
+- Identify best-performing features
+- ROI metrics for DevRel efforts
 
-**<img src="https://img.icons8.com/fluent/20/bell.png" alt="Bell" width="16"/> Notifications & Alerts**
-- Slack integration for experiment completion
-- Discord webhooks
-- Email summaries
-- Real-time progress updates
+**<img src="https://img.icons8.com/fluent/20/blog.png" alt="Blog" width="16"/> Blog Post Generation**
+- Generate full technical blog posts from PRs
+- Include code examples and explanations
+- SEO optimization
+- Markdown export for publishing
 
-**<img src="https://img.icons8.com/fluent/20/video.png" alt="Video" width="16"/> Video Recordings**
-- Record browser sessions
-- Watch exactly what agents do
-- Share videos with team
-- Better debugging
+**<img src="https://img.icons8.com/fluent/20/youtube.png" alt="YouTube" width="16"/> YouTube Shorts / TikTok**
+- Generate short-form video content
+- Vertical format optimization
+- Trending music integration
+- Auto-upload to platforms
 
-**<img src="https://img.icons8.com/fluent/20/paint-palette.png" alt="Customize" width="16"/> Custom Browser Tasks**
-- Let users write custom test scenarios
-- Template library for common flows
-- Industry-specific templates (e-commerce, SaaS, etc.)
+**<img src="https://img.icons8.com/fluent/20/diversity.png" alt="Multiple" width="16"/> Multi-Language Support**
+- Translate posts to multiple languages
+- Localized hashtags
+- Regional best practices
+- Timezone-aware scheduling
 
 ---
 
 ### <img src="https://img.icons8.com/fluent/24/goal.png" alt="Target" width="20"/> Long-term (6+ months)
 
-**<img src="https://img.icons8.com/fluent/20/globe.png" alt="Globe" width="16"/> Multi-Framework Support**
-- Vue.js applications
-- Angular applications
-- Svelte applications
-- Static sites (Jekyll, Hugo)
+**<img src="https://img.icons8.com/fluent/20/calendar.png" alt="Calendar" width="16"/> Content Calendar Planning**
+- Plan feature releases around content calendar
+- Batch multiple features for coordinated launches
+- Campaign management
+- Content strategy recommendations
 
-**<img src="https://img.icons8.com/fluent/20/smartphone-tablet.png" alt="Mobile" width="16"/> Mobile App Testing**
-- React Native support
-- Flutter support
-- Native iOS/Android
-- Cross-platform testing
+**<img src="https://img.icons8.com/fluent/20/collaboration.png" alt="Team" width="16"/> Team Collaboration Features**
+- Review and approve posts before publishing
+- Assign tasks to team members
+- Comment and feedback system
+- Version control for post copy
 
-**<img src="https://img.icons8.com/fluent/20/accessibility.png" alt="Accessibility" width="16"/> Accessibility Testing**
-- Automated a11y audits
-- WCAG compliance checks
-- Screen reader simulation
-- Keyboard navigation testing
+**<img src="https://img.icons8.com/fluent/20/puzzle.png" alt="Integration" width="16"/> Product Hunt / Hacker News Integration**
+- Auto-generate Product Hunt launch posts
+- Hacker News "Show HN" posts
+- Reddit post optimization
+- Cross-platform campaign orchestration
 
-**<img src="https://img.icons8.com/fluent/20/search.png" alt="Search" width="16"/> SEO Impact Analysis**
-- Track SEO metrics per variant
-- Monitor search rankings
-- Optimize for Core Web Vitals
-- Structured data validation
-
-**<img src="https://img.icons8.com/fluent/20/money.png" alt="Money" width="16"/> Cost-Benefit Analysis**
-- Calculate implementation costs
-- Estimate revenue impact
-- ROI projections per variant
-- Budget optimization recommendations
-
-**<img src="https://img.icons8.com/fluent/20/building.png" alt="Enterprise" width="16"/> Enterprise Features**
-- Team collaboration
-- Role-based access control
-- Audit logs and compliance
-- White-label options
-- On-premise deployment
+**<img src="https://img.icons8.com/fluent/20/api.png" alt="API" width="16"/> Public API & Zapier Integration**
+- Public API for custom integrations
+- Zapier/Make.com connectors
+- Webhook triggers for other tools
+- White-label options for agencies
 
 ---
 
-## <img src="https://img.icons8.com/fluent/50/video.png" alt="Demo" width="28"/> Example Use Cases
+## <img src="https://img.icons8.com/fluent/50/video.png" alt="Demo" width="28"/> Real-World Example
 
-### <img src="https://img.icons8.com/fluent/24/shopping-cart.png" alt="Shopping" width="20"/> E-commerce: Product Discovery
-**Input:**  
-"Users can't find products easily on our clothing store"
+### <img src="https://img.icons8.com/fluent/24/github.png" alt="GitHub" width="20"/> Scenario: E-commerce Dark Mode Feature
 
-**AXIOM's Output:**
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> **Variant 1:** Price filter sidebar → Users find products 40% faster
-- <img src="https://img.icons8.com/fluent/16/cancel.png" alt="X" width="14"/> **Variant 2:** Category dropdown → Users found it confusing
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> **Variant 3:** Search with autocomplete → Users loved it, 60% engagement increase
+**PR Merged:** "Add dark mode toggle to settings"  
+**CodeRabbit Summary:** "Implemented dark mode with persistent user preference, theme toggle in settings, and smooth transitions"
 
-**Deploy:** Variants 1 + 3 → Combined solution
+**AXIOM's Automated Process:**
 
----
+**1. Webhook received** → Experiment created  
+**2. Sandbox spun up** → App deployed with dark mode  
+**3. Features extracted:** 
+- "Dark mode toggle in settings"
+- "Persistent theme preference"
+- "Smooth color transitions"
 
-### <img src="https://img.icons8.com/fluent/24/software.png" alt="SaaS" width="20"/> SaaS: Onboarding Flow
-**Input:**  
-"New users don't complete onboarding"
+**4. Browser agent task:** "Explore the new dark mode feature. Navigate to settings, toggle dark mode on and off, and browse different pages to show the theme change."
 
-**AXIOM's Output:**
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> **Variant 1:** Progress indicator → 25% more completions
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> **Variant 2:** Skip optional steps → 40% more completions
-- <img src="https://img.icons8.com/fluent/16/cancel.png" alt="X" width="14"/> **Variant 3:** Gamification → No significant impact
+**5. Screenshots captured (6 total):**
+- Screenshot 1: Settings page with toggle
+- Screenshot 2: Toggle switched to dark mode
+- Screenshot 3: Homepage in dark mode
+- Screenshot 4: Product page in dark mode
+- Screenshot 5: Cart page in dark mode
+- Screenshot 6: Toggle back to light mode
 
-**Deploy:** Variants 1 + 2 → 65% improvement total
+**6. Social posts generated:**
 
----
+**Twitter:**
+> 🌙 Dark mode is here! Your eyes will thank you. Toggle between light and dark themes seamlessly in settings. Try it now! #DarkMode #UX #WebDev #UserExperience
 
-### <img src="https://img.icons8.com/fluent/24/smartphone-tablet.png" alt="Mobile" width="20"/> Mobile: Navigation UX
-**Input:**  
-"Mobile menu is hard to find"
+**LinkedIn:**
+> We're excited to announce the launch of our highly requested dark mode feature! 🌙
+>
+> This update includes:
+> ✅ One-click theme toggle in settings
+> ✅ Persistent theme preference across sessions
+> ✅ Smooth transitions for a polished experience
+>
+> We've listened to your feedback and built a dark mode that's easy on the eyes during late-night shopping sessions. Try it out and let us know what you think!
+>
+> #DarkMode #ProductUpdate #UXDesign #WebDevelopment #EcommerceTech
 
-**AXIOM's Output:**
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> **Variant 1:** Hamburger with label → +20% discoverability
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> **Variant 2:** Bottom navigation bar → +55% ease of use
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> **Variant 3:** Sticky header → +30% visibility
-
-**Deploy:** Variant 2 → Best overall UX scores
-
----
-
-### <img src="https://img.icons8.com/fluent/24/microphone.png" alt="DevRel" width="20"/> DevRel: Feature Announcement
-**Input:**  
-PR merged: "Add dark mode support"
-
-**AXIOM's Output:**
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> Sandbox created with merged code
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> Browser agent demonstrates dark mode
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> Screenshots captured at each step
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> Social media post generated:
-  > "<img src="https://img.icons8.com/fluent/16/moon-symbol.png" alt="Moon" width="14"/> Dark mode is here! Experience our sleek new theme with one click. Your eyes will thank you. #darkmode #ux"
-- <img src="https://img.icons8.com/fluent/16/checkmark.png" alt="Check" width="14"/> Ready to share on Twitter + LinkedIn
+**7. Dashboard shows:**
+- Live demo link: `https://sandbox-abc123.daytona.dev`
+- 6 screenshots ready to download
+- Copy buttons for Twitter + LinkedIn posts
+- Total time: **4 minutes 32 seconds**
 
 ---
 
 ## <img src="https://img.icons8.com/fluent/50/settings.png" alt="Tools" width="28"/> Built With
 
 - [Daytona](https://www.daytona.io/) - Cloud development environments
-- [Claude Code](https://www.anthropic.com/) - Autonomous code implementation
 - [Browser-use](https://browser-use.com/) - Natural browser automation
 - [Bun](https://bun.sh/) - Fast JavaScript runtime
 - [Elysia](https://elysiajs.com/) - Type-safe web framework
@@ -590,7 +574,8 @@ PR merged: "Add dark mode support"
 - [Inngest](https://www.inngest.com/) - Durable execution
 - [TailwindCSS](https://tailwindcss.com/) - Styling
 - [Framer Motion](https://www.framer.com/motion/) - Animations
-- [Google Gemini](https://deepmind.google/technologies/gemini/) - AI analysis
+- [Google Gemini](https://deepmind.google/technologies/gemini/) - AI for feature extraction and social posts
+- [CodeRabbit AI](https://coderabbit.ai/) - Automated PR reviews and summaries
 
 ---
 
@@ -603,43 +588,79 @@ PR merged: "Add dark mode support"
 
 ## <img src="https://img.icons8.com/fluent/50/rocket.png" alt="Launch" width="28"/> Try AXIOM
 
-**Setup:**
+### Setup:
+
+**1. Backend:**
 ```bash
-# Backend
-cd api && bun install && bun run dev
-
-# Inngest worker (separate terminal)
-cd api && bun run inngest
-
-# Frontend
-cd web && npm install && npm run dev
+cd api
+bun install
+bun run db:push      # Initialize database
+bun run dev          # Terminal 1: API server (port 8000)
+bun run inngest      # Terminal 2: Background jobs
 ```
 
-**Visit:** http://localhost:3000
+**2. Frontend:**
+```bash
+cd web
+npm install
+npm run dev          # Port 3000
+```
 
-**Create your first experiment:**
-1. Enter a GitHub repository URL
-2. Describe a UX problem
-3. Watch AXIOM work its magic! <img src="https://img.icons8.com/fluent/20/magic-wand.png" alt="Magic" width="16"/>
+**3. GitHub Webhook Server:**
+```bash
+cd gh-webhook
+npm install
+npm run dev          # Port 8080
+```
+
+**4. Configure GitHub Webhook:**
+- Go to your repo → Settings → Webhooks
+- Add webhook: `https://your-domain.com/github-webhook`
+- Content type: `application/json`
+- Secret: Generate with `openssl rand -hex 32`
+- Events: Select "Pull requests"
+
+**5. Environment Variables:**
+```env
+# api/.env
+DATABASE_URL=postgresql://...
+DAYTONA_API_KEY=your_key
+GOOGLE_AI_API_KEY=your_gemini_key
+INNGEST_EVENT_KEY=your_key
+BROWSER_USE_API_KEY=your_key
+
+# gh-webhook/.env
+GH_WEBHOOK_SECRET=your_webhook_secret
+GH_TOKEN=your_github_token
+SANDBOX_URL=http://localhost:8000/experiment/from-webhook
+```
+
+**6. Test It:**
+- Merge a PR to your repository
+- AXIOM automatically processes it
+- Visit `http://localhost:3000` to see results
+- Copy generated posts and share on social media!
 
 ---
 
 ## <img src="https://img.icons8.com/fluent/50/thanks.png" alt="Thanks" width="28"/> Acknowledgments
 
 Huge thanks to:
-- **Daytona** for revolutionizing development environments
-- **Anthropic** for Claude Code's autonomous capabilities
-- **Browser-use** for natural user simulation
+- **Daytona** for revolutionizing cloud development environments
+- **Browser-use** for making browser automation natural and AI-powered
+- **CodeRabbit** for excellent PR analysis and summaries
 - **Inngest** for making durable execution accessible
-- **The open-source community** for incredible tools
+- **Google** for Gemini API and incredible AI models
+- **The open-source community** for amazing tools
 
 ---
 
 <div align="center">
 
-## <img src="https://img.icons8.com/fluent/48/lightning-bolt.png" alt="Lightning" width="32"/> From weeks to minutes - that's the power of AXIOM
+## <img src="https://img.icons8.com/fluent/48/lightning-bolt.png" alt="Lightning" width="32"/> From 5 hours to 5 minutes - that's the power of AXIOM
+
+**DevRel automation for the modern era**
 
 **Made with <img src="https://img.icons8.com/fluent/20/heart.png" alt="Love" width="16"/> for Daytona Hacksprint 2025**
 
 </div>
-
