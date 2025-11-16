@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   RiImageAddLine,
@@ -6,6 +8,7 @@ import {
   RiExternalLinkLine,
 } from '@remixicon/react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 interface Screenshot {
   url: string;
@@ -50,37 +53,48 @@ export const ScreenshotsCard = ({
   const config = statusConfig[status];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <RiImageAddLine size={20} />
-          Screenshots
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      <Card className="hover-lift glass-card border-neutral-200 dark:border-neutral-700/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RiImageAddLine size={20} />
+            Screenshots
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
         <div className="flex items-start gap-3">
           <div className="pt-0.5">{config.icon}</div>
           <div className="flex-1">
-            <p className="font-medium text-neutral-900">{config.label}</p>
-            <p className="text-sm text-neutral-600">{config.description}</p>
+            <p className="font-medium text-neutral-900 dark:text-neutral-100">{config.label}</p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">{config.description}</p>
           </div>
         </div>
 
         {screenshots.length > 0 && (
           <div className="pt-3 border-t">
-            <p className="text-sm font-medium text-neutral-900 mb-3">
+            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 mb-3">
               Captured Screenshots ({screenshots.length})
             </p>
             <div className="grid grid-cols-1 gap-3">
               {screenshots.map((screenshot, idx) => (
-                <div key={idx} className="space-y-2">
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: idx * 0.1 }}
+                  className="space-y-2"
+                >
                   <div className="flex items-center justify-between">
                     <div>
                       {screenshot.step && (
-                        <p className="text-xs text-neutral-500">Step {screenshot.step}</p>
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400">Step {screenshot.step}</p>
                       )}
                       {screenshot.description && (
-                        <p className="text-sm font-medium text-neutral-700">
+                        <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                           {screenshot.description}
                         </p>
                       )}
@@ -89,7 +103,7 @@ export const ScreenshotsCard = ({
                       href={screenshot.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-700"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                     >
                       <RiExternalLinkLine size={16} />
                     </a>
@@ -98,7 +112,7 @@ export const ScreenshotsCard = ({
                     href={screenshot.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block relative w-full rounded-lg overflow-hidden bg-neutral-100 hover:ring-2 hover:ring-blue-500 transition-all"
+                    className="block relative w-full rounded-lg overflow-hidden bg-neutral-100 hover:ring-2 hover:ring-blue-500 transition-all hover-lift"
                   >
                     <div className="relative w-full h-48 bg-neutral-200">
                       <Image
@@ -114,7 +128,7 @@ export const ScreenshotsCard = ({
                       />
                     </div>
                   </a>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -122,12 +136,13 @@ export const ScreenshotsCard = ({
 
         {status === 'pending' && (
           <div className="pt-3 border-t">
-            <p className="text-sm text-neutral-600 text-center py-4">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 text-center py-4">
               Screenshots will appear here as the browser agent explores the site
             </p>
           </div>
         )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };

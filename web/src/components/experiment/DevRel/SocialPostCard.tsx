@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -6,8 +8,12 @@ import {
   RiLoader4Line,
   RiFileCopyLine,
   RiTwitterXFill,
+  RiCheckLine,
 } from '@remixicon/react';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { AuroraText } from '@/components/ui/advanced/AuroraText';
+import { RainbowButton } from '@/components/ui/advanced/RainbowButton';
 
 interface SocialPostCardProps {
   status?: 'pending' | 'generating' | 'completed' | 'failed';
@@ -73,19 +79,24 @@ export const SocialPostCard = ({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <RiShareForwardLine size={20} />
-          Social Media Post
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+    >
+      <Card className="hover-lift glass-card border-neutral-200 dark:border-neutral-700/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RiShareForwardLine size={20} />
+            <AuroraText className="text-lg">Social Media Post</AuroraText>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
         <div className="flex items-start gap-3">
           <div className="pt-0.5">{config.icon}</div>
           <div className="flex-1">
-            <p className="font-medium text-neutral-900">{config.label}</p>
-            <p className="text-sm text-neutral-600">{config.description}</p>
+            <p className="font-medium text-neutral-900 dark:text-neutral-100">{config.label}</p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">{config.description}</p>
           </div>
         </div>
 
@@ -93,37 +104,33 @@ export const SocialPostCard = ({
           <div className="pt-3 border-t space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-neutral-500 mb-1">Platform</p>
-                <p className="text-sm font-medium text-neutral-900">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">Platform</p>
+                <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                   {platformLabels[platform]}
                 </p>
               </div>
-              <button
-                onClick={handleCopy}
-                className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded transition-colors text-sm"
-              >
-                <RiFileCopyLine size={14} />
-                {copied ? 'Copied!' : 'Copy'}
-              </button>
             </div>
 
-            <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
-              <p className="text-sm text-neutral-800 whitespace-pre-wrap leading-relaxed">
+            <div className="glass rounded-lg p-4 border border-neutral-200/50 dark:border-neutral-700/50">
+              <p className="text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap leading-relaxed">
                 {postContent}
               </p>
             </div>
 
             {hashtags.length > 0 && (
               <div className="space-y-1">
-                <p className="text-xs text-neutral-500">Hashtags</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">Hashtags</p>
                 <div className="flex flex-wrap gap-2">
                   {hashtags.map((tag, idx) => (
-                    <span
+                    <motion.span
                       key={idx}
-                      className="text-sm text-blue-600 bg-blue-50 px-2.5 py-1 rounded"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 px-2.5 py-1 rounded hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
                     >
                       {tag}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>
@@ -190,12 +197,13 @@ export const SocialPostCard = ({
 
         {status === 'pending' && (
           <div className="pt-3 border-t">
-            <p className="text-sm text-neutral-600 text-center py-4">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 text-center py-4">
               A social media post will be generated after the browser task completes
             </p>
           </div>
         )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };

@@ -8,8 +8,10 @@ import {
   RiArrowLeftLine,
   RiGitRepositoryLine,
   RiTargetLine,
+  RiRocketLine,
 } from '@remixicon/react';
 import Link from 'next/link';
+import { GridBeamsBackground } from '@/components/ui/advanced';
 import { SandboxCard } from './DevRel/SandboxCard';
 import { BrowserTaskCard } from './DevRel/BrowserTaskCard';
 import { ScreenshotsCard } from './DevRel/ScreenshotsCard';
@@ -58,10 +60,11 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center">
-        <div className="text-center">
-          <RiFlaskLine size={48} className="mx-auto mb-4 text-neutral-400 animate-pulse" />
-          <p className="text-neutral-600">Loading experiment details...</p>
+      <div className="relative min-h-screen flex items-center justify-center">
+        <GridBeamsBackground />
+        <div className="relative z-10 text-center">
+          <RiFlaskLine size={48} className="mx-auto mb-4 text-neutral-400 dark:text-neutral-500 animate-pulse" />
+          <p className="text-neutral-600 dark:text-neutral-400">Loading experiment details...</p>
         </div>
       </div>
     );
@@ -69,13 +72,14 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
 
   if (isError || !experiment) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center">
-        <Card className="max-w-md">
+      <div className="relative min-h-screen flex items-center justify-center">
+        <GridBeamsBackground />
+        <Card className="relative z-10 max-w-md">
           <CardHeader>
             <CardTitle>Experiment Not Found</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-neutral-600 mb-4">
+            <p className="text-neutral-600 dark:text-neutral-400 mb-4">
               The experiment you're looking for doesn't exist or has been deleted.
             </p>
             <Link href="/">
@@ -100,8 +104,9 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
   const statusLabel = statusLabels[experiment.status] || experiment.status;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
-      <div className="container mx-auto px-4 py-8 space-y-6">
+    <div className="relative min-h-screen">
+      <GridBeamsBackground />
+      <div className="relative z-10 container mx-auto px-4 py-8 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -112,9 +117,9 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
               </Button>
             </Link>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold">Experiment</h1>
-              <span className="text-neutral-400">•</span>
-              <span className="text-sm text-neutral-500">{statusLabel}</span>
+              <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Experiment</h1>
+              <span className="text-neutral-400 dark:text-neutral-600">•</span>
+              <span className="text-sm text-neutral-500 dark:text-neutral-400">{statusLabel}</span>
             </div>
           </div>
         </div>
@@ -130,32 +135,32 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
           <CardContent className="space-y-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <RiGitRepositoryLine size={18} className="text-neutral-600" />
-                <p className="text-sm font-medium text-neutral-700">Repository</p>
+                <RiGitRepositoryLine size={18} className="text-neutral-600 dark:text-neutral-400" />
+                <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Repository</p>
               </div>
-              <p className="text-sm text-neutral-600 font-mono bg-neutral-50 p-2 rounded">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 font-mono bg-neutral-50 dark:bg-neutral-800/50 p-2 rounded">
                 {experiment.repoUrl}
               </p>
             </div>
 
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <RiTargetLine size={18} className="text-neutral-600" />
-                <p className="text-sm font-medium text-neutral-700">Goal</p>
+                <RiTargetLine size={18} className="text-neutral-600 dark:text-neutral-400" />
+                <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Goal</p>
               </div>
-              <p className="text-sm text-neutral-600">{experiment.goal}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">{experiment.goal}</p>
             </div>
 
             <div className="flex gap-6 text-sm">
               <div>
-                <p className="text-neutral-500">Created</p>
-                <p className="font-medium">
+                <p className="text-neutral-500 dark:text-neutral-400">Created</p>
+                <p className="font-medium text-neutral-900 dark:text-neutral-100">
                   {new Date(experiment.createdAt).toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className="text-neutral-500">Last Updated</p>
-                <p className="font-medium">
+                <p className="text-neutral-500 dark:text-neutral-400">Last Updated</p>
+                <p className="font-medium text-neutral-900 dark:text-neutral-100">
                   {new Date(experiment.updatedAt).toLocaleString()}
                 </p>
               </div>
@@ -166,8 +171,9 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
         {/* DevRel Flow Pipeline */}
         <div className="space-y-6">
           <div>
-            <h2 className="text-sm font-semibold text-neutral-700 mb-3 flex items-center gap-2">
-              🚀 DevRel Pipeline
+            <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3 flex items-center gap-2">
+              <RiRocketLine size={18} className="text-blue-600 dark:text-blue-400" />
+              DevRel Pipeline
             </h2>
 
             {/* Step 1: Sandbox */}

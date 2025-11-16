@@ -7,6 +7,7 @@ import Elysia, { t } from 'elysia';
 import { inngestClient } from '@/lib/inngest-client';
 import { VariantEntity, variantsTable } from '@/db/variant.db';
 import { createExperimentJob, ExperimentRunJobData } from './Experiment.jobs';
+import { Sentry, setExperimentContext, setVariantContext, addBreadcrumb } from '@/lib/sentry';
 
 export const experimentRoutes = new Elysia({ prefix: '/experiment' })
   .get('/', () => {
@@ -336,114 +337,221 @@ export abstract class ExperimentService {
    * This creates sandbox, clones repo, installs dependencies, and starts dev server
    */
   static async initRepository(repoUrl: string, experimentId: Id<'experiment'>) {
-    let start = Date.now();
-    let end = Date.now();
+    // Set Sentry context for this experiment
+    setExperimentContext(experimentId, { repoUrl });
+    addBreadcrumb('Starting repository initialization', 'experiment', { experimentId, repoUrl });
 
-    start = Date.now();
-    
-    // Retry sandbox creation up to 3 times on timeout
-    let sandbox;
-    let retries = 3;
-    let lastError;
-    
-    for (let i = 0; i < retries; i++) {
-      try {
-        console.log(`Creating sandbox (attempt ${i + 1}/${retries})...`);
-        sandbox = await daytona.create({
-          language: 'typescript',
-          public: true,
-          envVars: {
-            NODE_ENV: 'development',
-          },
-        });
-        break; // Success! Exit retry loop
-      } catch (error) {
-        lastError = error;
-        console.error(`Sandbox creation attempt ${i + 1} failed:`, error.message);
-        
-        if (i < retries - 1) {
-          const waitTime = (i + 1) * 5000; // Wait 5s, 10s, 15s
-          console.log(`Retrying in ${waitTime / 1000} seconds...`);
-          await new Promise(resolve => setTimeout(resolve, waitTime));
+    // Start Sentry transaction to track performance
+    const transaction = Sentry.startTransaction({
+      op: 'experiment.init',
+      name: 'Initialize Repository',
+      tags: {
+        experimentId,
+        repoUrl,
+      },
+    });
+
+    try {
+      let start = Date.now();
+      let end = Date.now();
+
+      // Track sandbox creation with Sentry span
+      const sandboxSpan = transaction.startChild({
+        op: 'daytona.create_sandbox',
+        description: 'Create Daytona sandbox',
+      });
+
+      start = Date.now();
+      
+      // Retry sandbox creation up to 3 times on timeout
+      let sandbox;
+      let retries = 3;
+      let lastError;
+      
+      for (let i = 0; i < retries; i++) {
+        try {
+          console.log(`Creating sandbox (attempt ${i + 1}/${retries})...`);
+          addBreadcrumb(`Sandbox creation attempt ${i + 1}`, 'daytona', { attempt: i + 1, retries });
+          
+          sandbox = await daytona.create({
+            language: 'typescript',
+            public: true,
+            envVars: {
+              NODE_ENV: 'development',
+            },
+          });
+          break; // Success! Exit retry loop
+        } catch (error) {
+          lastError = error;
+          console.error(`Sandbox creation attempt ${i + 1} failed:`, error.message);
+          
+          // Capture each retry failure as a warning
+          Sentry.captureException(error, {
+            tags: {
+              attempt: i + 1,
+              experimentId,
+            },
+            level: i < retries - 1 ? 'warning' : 'error',
+          });
+          
+          if (i < retries - 1) {
+            const waitTime = (i + 1) * 5000; // Wait 5s, 10s, 15s
+            console.log(`Retrying in ${waitTime / 1000} seconds...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+          }
         }
       }
+      
+      if (!sandbox) {
+        sandboxSpan.setStatus('failed');
+        sandboxSpan.finish();
+        transaction.setStatus('failed');
+        transaction.finish();
+        throw new Error(`Failed to create sandbox after ${retries} attempts. Last error: ${lastError?.message || 'Unknown'}`);
+      }
+      
+      end = Date.now();
+      const sandboxDuration = end - start;
+      sandboxSpan.setData('duration_ms', sandboxDuration);
+      sandboxSpan.setData('sandbox_id', sandbox.id);
+      sandboxSpan.setStatus('ok');
+      sandboxSpan.finish();
+      console.log(`Time taken to create sandbox: ${sandboxDuration}ms`);
+      
+      // Add performance metric to Sentry
+      Sentry.setMeasurement('sandbox_creation_time', sandboxDuration, 'millisecond');
+
+      // Track git clone
+      const cloneSpan = transaction.startChild({
+        op: 'git.clone',
+        description: 'Clone repository',
+      });
+
+      start = Date.now();
+      await sandbox.git.clone(repoUrl, ExperimentService.WORK_DIR);
+      end = Date.now();
+      const cloneDuration = end - start;
+      
+      cloneSpan.setData('duration_ms', cloneDuration);
+      cloneSpan.setStatus('ok');
+      cloneSpan.finish();
+      console.log(`Time taken to clone repository: ${cloneDuration}ms`);
+      Sentry.setMeasurement('git_clone_time', cloneDuration, 'millisecond');
+
+      // Install pm2
+      addBreadcrumb('Installing PM2', 'setup');
+      const pm2InstallResult = await sandbox.process.executeCommand(
+        `npm install -g pm2`
+      );
+      console.log(
+        `PM2 install result: ${JSON.stringify(pm2InstallResult, null, 2)}`
+      );
+
+      // Track dependency installation
+      const installSpan = transaction.startChild({
+        op: 'npm.install',
+        description: 'Install dependencies',
+      });
+
+      start = Date.now();
+      await sandbox.process.executeCommand(
+        `npm install`,
+        ExperimentService.WORK_DIR
+      );
+      end = Date.now();
+      const installDuration = end - start;
+      
+      installSpan.setData('duration_ms', installDuration);
+      installSpan.setStatus('ok');
+      installSpan.finish();
+      console.log(`Time taken to install dependencies: ${installDuration}ms`);
+      Sentry.setMeasurement('npm_install_time', installDuration, 'millisecond');
+
+      // print out the current directory
+      const cwdLs = await sandbox.process.executeCommand(
+        `ls`,
+        ExperimentService.WORK_DIR
+      );
+      console.log(`Current directory ls: ${JSON.stringify(cwdLs, null, 2)}`);
+
+      // Track dev server start
+      const serverSpan = transaction.startChild({
+        op: 'server.start',
+        description: 'Start dev server',
+      });
+
+      start = Date.now();
+      const codeRunResult = await sandbox.process.executeCommand(
+        `pm2 start npm --name "vite-dev-server" -- run dev`,
+        ExperimentService.WORK_DIR
+      );
+      end = Date.now();
+      const serverDuration = end - start;
+      
+      serverSpan.setData('duration_ms', serverDuration);
+      serverSpan.setStatus('ok');
+      serverSpan.finish();
+      console.log(`Time taken to execute npm run dev: ${serverDuration}ms`);
+      console.log(`Code run result: ${JSON.stringify(codeRunResult, null, 2)}`);
+      Sentry.setMeasurement('server_start_time', serverDuration, 'millisecond');
+
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      console.log('Dev server should be running now');
+
+      start = Date.now();
+      const previewUrl = await sandbox.getPreviewLink(3000);
+      end = Date.now();
+      console.log(`Time taken to get preview link: ${end - start}ms`);
+
+      // insert to db
+      const newVariant: VariantEntity = {
+        id: generateId('variant'),
+        createdAt: new Date().toISOString(),
+        experimentId: experimentId,
+        daytonaSandboxId: sandbox.id,
+        publicUrl: previewUrl.url,
+        type: 'control',
+        suggestion: null, // Control variant has no suggestion - it's the baseline
+        analysis: null,
+      };
+
+      setVariantContext(newVariant.id, {
+        type: 'control',
+        sandboxId: sandbox.id,
+        publicUrl: previewUrl.url,
+      });
+
+      await db.insert(variantsTable).values(newVariant);
+
+      // Mark transaction as successful
+      transaction.setStatus('ok');
+      transaction.finish();
+      
+      addBreadcrumb('Repository initialization complete', 'experiment', {
+        variantId: newVariant.id,
+        publicUrl: previewUrl.url,
+      });
+
+      return {
+        sandbox: {
+          ...sandbox,
+          previewUrl: previewUrl.url,
+        },
+        variant: newVariant,
+      };
+    } catch (error) {
+      // Capture the error with full context
+      Sentry.captureException(error, {
+        tags: {
+          experimentId,
+          operation: 'init_repository',
+        },
+      });
+
+      transaction.setStatus('internal_error');
+      transaction.finish();
+      
+      throw error;
     }
-    
-    if (!sandbox) {
-      throw new Error(`Failed to create sandbox after ${retries} attempts. Last error: ${lastError?.message || 'Unknown'}`);
-    }
-    
-    end = Date.now();
-    console.log(`Time taken to create sandbox: ${end - start}ms`);
-
-    // Clone the repository into the sandbox
-    start = Date.now();
-    await sandbox.git.clone(repoUrl, ExperimentService.WORK_DIR);
-    end = Date.now();
-    console.log(`Time taken to clone repository: ${end - start}ms`);
-
-    // Install pm2
-    const pm2InstallResult = await sandbox.process.executeCommand(
-      `npm install -g pm2`
-    );
-    console.log(
-      `PM2 install result: ${JSON.stringify(pm2InstallResult, null, 2)}`
-    );
-
-    // Install dependencies
-    start = Date.now();
-    await sandbox.process.executeCommand(
-      `npm install`,
-      ExperimentService.WORK_DIR
-    );
-    end = Date.now();
-    console.log(`Time taken to install dependencies: ${end - start}ms`);
-
-    // print out the current directory
-    const cwdLs = await sandbox.process.executeCommand(
-      `ls`,
-      ExperimentService.WORK_DIR
-    );
-    console.log(`Current directory ls: ${JSON.stringify(cwdLs, null, 2)}`);
-
-    start = Date.now();
-    // Start the development server
-    const codeRunResult = await sandbox.process.executeCommand(
-      `pm2 start npm --name "vite-dev-server" -- run dev`,
-      ExperimentService.WORK_DIR
-    );
-    end = Date.now();
-    console.log(`Time taken to execucte npm run dev: ${end - start}ms`);
-    console.log(`Code run result: ${JSON.stringify(codeRunResult, null, 2)}`);
-
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    console.log('Dev server should be running now');
-
-    start = Date.now();
-    const previewUrl = await sandbox.getPreviewLink(3000);
-    end = Date.now();
-    console.log(`Time taken to get preview link: ${end - start}ms`);
-
-    // insert to db
-    const newVariant: VariantEntity = {
-      id: generateId('variant'),
-      createdAt: new Date().toISOString(),
-      experimentId: experimentId,
-      daytonaSandboxId: sandbox.id,
-      publicUrl: previewUrl.url,
-      type: 'control',
-      suggestion: null, // Control variant has no suggestion - it's the baseline
-      analysis: null,
-    };
-
-    await db.insert(variantsTable).values(newVariant);
-
-    return {
-      sandbox: {
-        ...sandbox,
-        previewUrl: previewUrl.url,
-      },
-      variant: newVariant,
-    };
   }
 }

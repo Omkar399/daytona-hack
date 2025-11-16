@@ -1,9 +1,19 @@
-import { RiFlaskLine, RiGitBranchLine, RiTargetLine } from "@remixicon/react";
+import { 
+  RiFlaskLine, 
+  RiGitBranchLine, 
+  RiTargetLine,
+  RiFileListLine,
+  RiServerLine,
+  RiRobot2Line,
+  RiCameraLine,
+  RiShareForwardLine,
+} from "@remixicon/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RainbowButton } from "@/components/ui/advanced/RainbowButton";
 
 interface ExperimentFormData {
   repoUrl: string;
@@ -72,28 +82,43 @@ export function ExperimentForm({ formData, onFormDataChange, onSubmit, onCancel,
           </div>
 
           {/* Info Box */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-900">
-              <strong>How it works:</strong> When you merge a PR with CodeRabbit analysis, our DevRel agent will:
-              <br />
-              1️⃣ Extract new features from the PR analysis
-              <br />
-              2️⃣ Spawn a sandbox environment for your app
-              <br />
-              3️⃣ Use an AI browser agent to test the new features
-              <br />
-              4️⃣ Capture screenshots of the features in action
-              <br />
-              5️⃣ Generate an engaging social media post ready to share
+          <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/50 rounded-lg p-4">
+            <p className="text-sm text-blue-900 dark:text-blue-100 font-semibold mb-3">
+              How it works:
             </p>
+            <p className="text-sm text-blue-900 dark:text-blue-200 mb-2">
+              When you merge a PR with CodeRabbit analysis, our DevRel agent will:
+            </p>
+            <div className="space-y-2 mt-3">
+              <div className="flex items-start gap-2">
+                <RiFileListLine className="h-4 w-4 text-blue-700 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-blue-900 dark:text-blue-200">Extract new features from the PR analysis</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <RiServerLine className="h-4 w-4 text-blue-700 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-blue-900 dark:text-blue-200">Spawn a sandbox environment for your app</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <RiRobot2Line className="h-4 w-4 text-blue-700 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-blue-900 dark:text-blue-200">Use an AI browser agent to test the new features</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <RiCameraLine className="h-4 w-4 text-blue-700 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-blue-900 dark:text-blue-200">Capture screenshots of the features in action</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <RiShareForwardLine className="h-4 w-4 text-blue-700 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-blue-900 dark:text-blue-200">Generate an engaging social media post ready to share</span>
+              </div>
+            </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
-            <Button type="submit" size="lg" className="flex-1 gap-2" disabled={isSubmitting}>
+            <RainbowButton type="submit" className="flex-1" disabled={isSubmitting}>
               <RiFlaskLine className="h-5 w-5" />
               {isSubmitting ? "Starting..." : "Create DevRel Flow"}
-            </Button>
+            </RainbowButton>
             <Button
               type="button"
               variant="outline"
