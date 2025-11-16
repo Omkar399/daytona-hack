@@ -278,9 +278,6 @@ Tone: Enthusiastic, professional, friendly - like you're excited to share someth
 Return response as JSON with this structure:
 {
   "twitter": "...",
-  "linkedin": "...",
-  "hashtags": ["tag1", "tag2", "tag3", ...],
-  "callToAction": "..."
 }
 
 Return ONLY valid JSON, no markdown formatting.`,

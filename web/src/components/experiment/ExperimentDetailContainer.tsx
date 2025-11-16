@@ -1,6 +1,6 @@
 'use client';
 
-import { useExperimentDetailQuery, useApprovePostMutation } from '@/query/experiment.query';
+import { useExperimentDetailQuery, useApprovePostMutation, useSaveScreenshotsMutation } from '@/query/experiment.query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +14,7 @@ import { SandboxCard } from './DevRel/SandboxCard';
 import { BrowserTaskCard } from './DevRel/BrowserTaskCard';
 import { ScreenshotsCard } from './DevRel/ScreenshotsCard';
 import { SocialPostCard } from './DevRel/SocialPostCard';
+import { useState } from 'react';
 
 interface ExperimentDetailContainerProps {
   experimentId: string;
@@ -22,6 +23,10 @@ interface ExperimentDetailContainerProps {
 export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailContainerProps) => {
   const { experiment, isLoading, isError } = useExperimentDetailQuery(experimentId);
   const { approvePost, isPending: isApproving } = useApprovePostMutation();
+  const { saveScreenshots, isPending: isSavingScreenshots } = useSaveScreenshotsMutation();
+  const [selectedScreenshots, setSelectedScreenshots] = useState<string[]>(
+    experiment?.selectedScreenshots || []
+  );
 
   const handleApprove = async (expId: string) => {
     try {
@@ -38,6 +43,18 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
       console.log('✅ Post rejected');
     } catch (error) {
       console.error('❌ Failed to reject post:', error);
+    }
+  };
+
+  const handleSaveScreenshots = async () => {
+    try {
+      await saveScreenshots({
+        experimentId,
+        screenshotUrls: selectedScreenshots,
+      });
+      console.log('✅ Screenshot selection saved');
+    } catch (error) {
+      console.error('❌ Failed to save screenshot selection:', error);
     }
   };
 
@@ -184,6 +201,10 @@ export const ExperimentDetailContainer = ({ experimentId }: ExperimentDetailCont
                   step: idx + 1,
                 })) || []}
                 totalCount={experiment.experimentalVariants?.length || 0}
+                selectedScreenshots={selectedScreenshots}
+                onSelectionChange={setSelectedScreenshots}
+                onSaveSelection={handleSaveScreenshots}
+                isSaving={isSavingScreenshots}
               />
             </div>
 

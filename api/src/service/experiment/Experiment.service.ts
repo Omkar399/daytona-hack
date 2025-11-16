@@ -251,6 +251,39 @@ export const experimentRoutes = new Elysia({ prefix: '/experiment' })
         approved: t.Boolean(),
       }),
     }
+  )
+  .post(
+    '/:id/select-screenshots',
+    async ({ params, body }) => {
+      const experimentId = params.id as Id<'experiment'>;
+      const { screenshotUrls } = body;
+
+      console.log(`📸 Saving selected screenshots for experiment ${experimentId}`);
+      console.log(`   Selected ${screenshotUrls.length} screenshots`);
+
+      // Update experiment with selected screenshots
+      await db
+        .update(experimentsTable)
+        .set({
+          selectedScreenshots: screenshotUrls,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(experimentsTable.id, experimentId));
+
+      return {
+        success: true,
+        message: `Selected ${screenshotUrls.length} screenshots`,
+        selectedScreenshots: screenshotUrls,
+      };
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      body: t.Object({
+        screenshotUrls: t.Array(t.String()),
+      }),
+    }
   );
 
 export abstract class ExperimentService {

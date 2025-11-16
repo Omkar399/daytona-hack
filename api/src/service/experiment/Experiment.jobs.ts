@@ -225,8 +225,16 @@ export const runPostToXJob = inngestClient.createFunction(
       return experiments[0];
     });
 
-    // Get screenshots from variants
+    // Get screenshots - use selected screenshots if available, otherwise fetch all from variants
     const screenshots = await step.run('fetch-screenshots', async () => {
+      // If user has selected specific screenshots, use those
+      if (experiment.selectedScreenshots && experiment.selectedScreenshots.length > 0) {
+        console.log(`📸 Using ${experiment.selectedScreenshots.length} user-selected screenshots`);
+        return experiment.selectedScreenshots;
+      }
+
+      // Otherwise, fetch all screenshots from variants (legacy behavior)
+      console.log(`📸 No screenshots selected, fetching all from variants`);
       const { variantsTable } = await import('@/db/variant.db');
 
       const variants = await db

@@ -17,6 +17,7 @@ async function postToX() {
       1. Go to x.com and click on "Sign in" or "Log in"
       2. Enter the username: ${X_USERNAME}
       3. Enter the password: ${X_PASSWORD}
+      
       4. Complete any additional verification if required
       5. Once logged in, find the "Post" or "What's happening?" text box
       6. Type the following message: "${POST_CONTENT}"

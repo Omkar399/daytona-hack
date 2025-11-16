@@ -12,6 +12,7 @@ interface Experiment {
   variantSuggestions?: string[];
   postApprovalStatus?: 'pending' | 'approved' | 'rejected' | 'posted';
   postedToXAt?: string;
+  selectedScreenshots?: string[];
   controlVariant?: {
     id: string;
     daytonaSandboxId: string;
@@ -128,6 +129,32 @@ export const useApprovePostMutation = () => {
 
   return {
     approvePost: mutation.mutateAsync,
+    ...mutation,
+  };
+};
+
+// Save selected screenshots mutation
+export const useSaveScreenshotsMutation = () => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: ({ experimentId, screenshotUrls }: { experimentId: string; screenshotUrls: string[] }) => {
+      return API_CLIENT.fetch(`/experiment/${experimentId}/select-screenshots`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ screenshotUrls }),
+      });
+    },
+    onSuccess: (data, variables) => {
+      // Invalidate experiment query to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ['experiment', variables.experimentId] });
+    },
+  });
+
+  return {
+    saveScreenshots: mutation.mutateAsync,
     ...mutation,
   };
 };
