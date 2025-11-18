@@ -106,14 +106,37 @@ export const runExperimentJob = inngestClient.createFunction(
       }
 
       // Extract screenshot URLs from steps
-      const screenshots = taskSteps
+      const allScreenshots = taskSteps
         .filter((step: any) => step.screenshotUrl)
         .map((step: any) => ({
           url: step.screenshotUrl,
           description: step.nextGoal || step.memory || 'Feature demonstration',
+          stepNumber: step.number,
         }));
 
-      console.log(`🖼️  Found ${screenshots.length} screenshots`);
+      console.log(`\n${'='.repeat(60)}`);
+      console.log(`📸 SCREENSHOT COLLECTION DEBUG`);
+      console.log(`${'='.repeat(60)}`);
+      console.log(`Total task steps: ${taskSteps.length}`);
+      console.log(`Steps with screenshots: ${allScreenshots.length}`);
+      console.log(`\nAll screenshot descriptions:`);
+      allScreenshots.forEach((s, idx) => {
+        console.log(`  ${idx + 1}. [Step ${s.stepNumber}] ${s.description}`);
+      });
+      console.log(`${'='.repeat(60)}\n`);
+
+      // Use AI to intelligently filter screenshots to top 5
+      const screenshots = await AiService.filterScreenshotsWithAI(allScreenshots, {
+        maxScreenshots: 5,
+        featureDescription: prTitle || experiment.goal,
+        priorityKeywords: ['cart', 'register', 'checkout', 'success', 'total', 'complete']
+      });
+      
+      console.log(`\n✨ AI filtered screenshots from ${allScreenshots.length} to ${screenshots.length}`);
+      console.log(`Selected screenshots:`);
+      screenshots.forEach((s, idx) => {
+        console.log(`  ${idx + 1}. [Step ${s.stepNumber}] ${s.description}`);
+      });
       
       if (screenshots.length === 0 && taskSteps.length > 0) {
         console.warn(`⚠️  No screenshots found but ${taskSteps.length} steps exist. Step keys:`, Object.keys(taskSteps[0]));
@@ -271,8 +294,12 @@ export const runPostToXJob = inngestClient.createFunction(
       const postContent = experiment.variantSuggestions?.[0] || 'Check out our new feature!';
 
       console.log(`📝 Posting to X with content: ${postContent.substring(0, 100)}...`);
+      console.log(`🐍 Using local browser (Python) for reliable image uploads`);
 
-      const result = await BrowserService.postToX(postContent, screenshots);
+      // Use local browser for reliable file uploads
+      const result = await BrowserService.postToX(postContent, screenshots, {
+        useLocalBrowser: true
+      });
 
       return result;
     });

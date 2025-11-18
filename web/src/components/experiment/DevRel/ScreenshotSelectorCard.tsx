@@ -5,6 +5,7 @@ import {
   RiCheckboxCircleLine,
   RiCheckboxBlankLine,
   RiRefreshLine,
+  RiSparklingLine,
 } from '@remixicon/react';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
@@ -91,10 +92,25 @@ export const ScreenshotSelectorCard = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <CardTitle className="flex items-center gap-2 mb-2">
           <RiImageAddLine size={20} />
           Select Screenshots for Social Post
         </CardTitle>
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200">
+                <RiSparklingLine size={14} className="text-purple-600" />
+                <span className="text-xs font-medium text-purple-700">
+                  AI-Filtered Top {totalCount}
+                </span>
+              </div>
+              <p className="text-xs text-neutral-500">
+                Intelligently selected from all captured screenshots
+              </p>
+            </div>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
@@ -103,7 +119,7 @@ export const ScreenshotSelectorCard = ({
               {selectedCount} of {totalCount} screenshots selected
             </p>
             <p className="text-xs text-neutral-500">
-              Choose which screenshots to include in your social media post
+              Refine your selection or use all AI-curated screenshots
             </p>
           </div>
           <div className="flex gap-2">
@@ -142,6 +158,14 @@ export const ScreenshotSelectorCard = ({
                   }`}
                   onClick={() => handleToggle(screenshotId)}
                 >
+                  {/* AI-Selected Badge */}
+                  <div className="absolute top-2 left-2 z-10">
+                    <div className="px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white flex items-center gap-1 shadow-sm">
+                      <RiSparklingLine size={12} />
+                      <span className="text-xs font-medium">AI Pick</span>
+                    </div>
+                  </div>
+
                   {/* Selection Checkbox */}
                   <div className="absolute top-2 right-2 z-10">
                     <div

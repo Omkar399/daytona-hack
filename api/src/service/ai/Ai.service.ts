@@ -3,6 +3,15 @@ import { google } from '@ai-sdk/google';
 
 const model = google('gemini-2.0-flash-lite');
 
+/**
+ * Screenshot with description for filtering
+ */
+interface ScreenshotForFiltering {
+  url: string;
+  description: string;
+  stepNumber?: number;
+}
+
 export abstract class AiService {
   /**
    * Extract key features from a CodeRabbit summary to focus browser testing
@@ -321,34 +330,41 @@ Return ONLY valid JSON, no markdown formatting or additional text.`,
 
     const { text } = await generateText({
       model,
-      prompt: `You are creating an engaging social media post announcing new features for an e-commerce/developer tool.
+      prompt: `You are creating an engaging Twitter/X post announcing new features. Twitter has a STRICT 280 character limit.
 
 Feature Title: ${params.title}
 Feature Summary: ${params.summary}
 Screenshots Available: ${params.screenshots.length} screenshots showing:
 ${screenshotDescriptions}
 
-Create an engaging social media post that:
+Create a Twitter/X post that:
 1. Highlights the main value/benefit of this feature
 2. Creates excitement and encourages engagement
-3. Is suitable for both Twitter/X and LinkedIn (we'll adapt based on platform)
-4. Includes clear, relevant hashtags
-5. Has a call-to-action (try it now, check it out, etc.)
-6. Is concise but descriptive (under 280 characters for Twitter version, can be longer for LinkedIn)
+3. MUST be under 280 characters total
+4. Has a brief call-to-action (try it, check it out, etc.)
+5. Is punchy, exciting, and concise
+6. DOES NOT include any hashtags (#) - write naturally without hashtags
 
-For Twitter/X (max 280 chars): Create a punchy, exciting tweet
-For LinkedIn (no char limit): Create a more detailed, professional post
-For "all": Create a version that works on both platforms
+CRITICAL RULES:
+- The ENTIRE post MUST be 280 characters or less
+- DO NOT use hashtags (#) anywhere in the post
+- Count characters carefully - Twitter counts URLs as ~23 chars regardless of length
+- Use abbreviations if needed (e.g., "w/" instead of "with")
+- Prioritize impact over length - make every character count
+- Write naturally without hashtags - just engaging text
 
 Tone: Enthusiastic, professional, friendly - like you're excited to share something cool.
 
 Return response as JSON with this structure:
 {
-  "twitter": "...",
-  "linkedin": "...",
-  "hashtags": ["tag1", "tag2", "tag3", ...],
+  "twitter": "Your tweet text here (MUST be ≤280 chars, NO hashtags)",
   "callToAction": "..."
 }
+
+IMPORTANT: 
+- Do NOT include any hashtags (#) in the "twitter" field
+- The post should be natural, engaging text without hashtags
+- Total character count must be ≤280
 
 Return ONLY valid JSON, no markdown formatting.`,
     });
@@ -360,11 +376,294 @@ Return ONLY valid JSON, no markdown formatting.`,
     
     const parsed = JSON.parse(cleaned);
     
-    // Return a combined version suitable for general use
+    // Get the Twitter post and remove any hashtags that might have slipped through
+    let twitterPost = parsed.twitter || '';
+    
+    // Remove any hashtags that the AI might have included despite instructions
+    twitterPost = twitterPost.replace(/#\w+/g, '').trim();
+    
+    // Clean up multiple spaces
+    twitterPost = twitterPost.replace(/\s+/g, ' ').trim();
+    
+    // Enforce 280 character limit strictly
+    let finalPost = twitterPost;
+    if (finalPost.length > 280) {
+      console.warn(`⚠️  Generated post is ${finalPost.length} chars, truncating to 280...`);
+      finalPost = finalPost.substring(0, 277) + '...';
+    }
+    
+    // Final validation
+    if (finalPost.length > 280) {
+      finalPost = finalPost.substring(0, 280);
+    }
+    
+    console.log(`📝 Generated Twitter post: ${finalPost.length}/280 characters (no hashtags)`);
+    
     return {
-      content: `${parsed.linkedin}\n\n${parsed.hashtags.join(' ')}`,
-      hashtags: parsed.hashtags,
-      platform: 'all',
+      content: finalPost,
+      hashtags: [], // No hashtags
+      platform: 'twitter',
     };
+  }
+
+  /**
+   * Use AI to intelligently filter screenshots based on importance and relevance
+   * @param screenshots - All screenshots with descriptions
+   * @param options - Filtering criteria
+   * @returns Filtered list of most important screenshots
+   */
+  static async filterScreenshotsWithAI(
+    screenshots: ScreenshotForFiltering[],
+    options: {
+      maxScreenshots?: number;
+      featureDescription?: string;
+      priorityKeywords?: string[];
+    } = {}
+  ): Promise<ScreenshotForFiltering[]> {
+    const maxScreenshots = options.maxScreenshots || 5;
+    
+    // If we already have fewer screenshots than max, return all
+    if (screenshots.length <= maxScreenshots) {
+      console.log(`📸 ${screenshots.length} screenshots (within limit, no filtering needed)`);
+      return screenshots;
+    }
+
+    console.log(`🤖 Using AI to filter ${screenshots.length} screenshots down to ${maxScreenshots}...`);
+
+    // Pre-filter: Remove obvious duplicates (exact same descriptions)
+    const uniqueScreenshots = this.removeDuplicateDescriptions(screenshots);
+    
+    if (uniqueScreenshots.length < screenshots.length) {
+      console.log(`   ⚡ Pre-filtered: Removed ${screenshots.length - uniqueScreenshots.length} exact duplicates`);
+      console.log(`   📊 ${screenshots.length} → ${uniqueScreenshots.length} unique screenshots`);
+    }
+
+    // If after pre-filtering we're already at or below max, return those
+    if (uniqueScreenshots.length <= maxScreenshots) {
+      console.log(`   ✅ After removing duplicates: ${uniqueScreenshots.length} screenshots (within limit)`);
+      return uniqueScreenshots;
+    }
+
+    // Create a numbered list of screenshots for the AI
+    const screenshotList = uniqueScreenshots
+      .map((s, idx) => `${idx + 1}. Step ${s.stepNumber || idx + 1}: "${s.description}"`)
+      .join('\n');
+
+    const featureContext = options.featureDescription 
+      ? `\n\nThe feature being tested: ${options.featureDescription}`
+      : '';
+
+    const keywordsContext = options.priorityKeywords && options.priorityKeywords.length > 0
+      ? `\n\nImportant keywords to consider: ${options.priorityKeywords.join(', ')}`
+      : '';
+
+    const { text } = await generateText({
+      model,
+      prompt: `You are a professional content curator selecting screenshots for a social media post about a new feature.
+
+TASK: Select EXACTLY ${maxScreenshots} screenshots from ${uniqueScreenshots.length} total screenshots.${featureContext}${keywordsContext}
+
+Available screenshots:
+${screenshotList}
+
+SELECTION RULES (STRICTLY FOLLOW):
+
+1. **NUMBER REQUIREMENT:** 
+   - You MUST select EXACTLY ${maxScreenshots} screenshots
+   - No more, no less
+   - The "selected" array MUST have ${maxScreenshots} numbers
+
+2. **WHAT TO AVOID (DO NOT SELECT):**
+   ❌ Any screenshot with: "waiting", "loading", "scrolling", "observing", "navigating"
+   ❌ Similar/repetitive actions (pick only ONE of similar events)
+   ❌ Screenshots clustered together (spread them out)
+
+3. **WHAT TO PRIORITIZE (MUST SELECT):**
+   ✅ First screenshot (shows starting point)
+   ✅ Screenshots showing RESULTS (e.g., "total", "cost", "success", "completed", "confirmed")
+   ✅ Screenshots showing KEY ACTIONS (e.g., "clicked", "registered", "added")
+   ✅ Screenshots showing FINAL STATE (last or near-last screenshot)
+   ✅ Screenshots with important keywords: ${options.priorityKeywords?.join(', ') || 'N/A'}
+
+4. **DISTRIBUTION:**
+   - Spread selections across the timeline
+   - Select from: START (1-${Math.floor(uniqueScreenshots.length * 0.3)}), 
+     MIDDLE (${Math.floor(uniqueScreenshots.length * 0.3)}-${Math.floor(uniqueScreenshots.length * 0.7)}), 
+     END (${Math.floor(uniqueScreenshots.length * 0.7)}-${uniqueScreenshots.length})
+   - Minimum 2 steps gap between selections
+
+5. **QUALITY CHECK:**
+   - Each screenshot must show something DIFFERENT
+   - Together they must tell a COMPLETE story
+   - No boring/filler screenshots
+
+RESPONSE FORMAT (STRICTLY FOLLOW):
+{
+  "selected": [1, 8, 15, 22, 30],
+  "reasoning": "Selected screenshots showing: initial state, key action, result, important data, and final success - avoiding all waiting/scrolling steps",
+  "diversity_check": "Confirmed: all 5 screenshots are unique, well-distributed, and tell complete story"
+}
+
+CRITICAL RULES:
+- "selected" array MUST contain EXACTLY ${maxScreenshots} valid numbers between 1 and ${uniqueScreenshots.length}
+- DO NOT select any screenshot with boring keywords (waiting, scrolling, loading, observing)
+- MUST include screenshots showing important results/totals/costs if available
+
+Return ONLY valid JSON, no markdown formatting.`,
+    });
+
+    try {
+      const cleaned = text
+        .trim()
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '');
+      
+      const parsed = JSON.parse(cleaned);
+      
+      console.log(`\n   🤖 AI Response:`);
+      console.log(`   Reasoning: ${parsed.reasoning}`);
+      if (parsed.diversity_check) {
+        console.log(`   Diversity Check: ${parsed.diversity_check}`);
+      }
+      
+      // Validate selected indices
+      let selectedIndices = parsed.selected
+        .filter((idx: number) => idx >= 1 && idx <= uniqueScreenshots.length)
+        .map((idx: number) => idx - 1); // Convert to 0-based indexing
+
+      if (selectedIndices.length === 0) {
+        console.warn('⚠️  AI returned no valid selections, falling back to smart selection');
+        return this.fallbackScreenshotSelection(uniqueScreenshots, maxScreenshots);
+      }
+
+      let filtered = selectedIndices.map((idx: number) => uniqueScreenshots[idx]);
+
+      // Validate: Remove boring screenshots that slipped through
+      const boringKeywords = ['waiting', 'loading', 'scrolling', 'observing', 'navigating'];
+      const nonBoring = filtered.filter((s: ScreenshotForFiltering) => {
+        const desc = s.description.toLowerCase();
+        const isBoring = boringKeywords.some(keyword => desc.includes(keyword));
+        if (isBoring) {
+          console.log(`      ⚠️  Rejecting boring screenshot: "${s.description}"`);
+        }
+        return !isBoring;
+      });
+
+      // If we removed boring ones, we need to add more
+      if (nonBoring.length < maxScreenshots) {
+        console.log(`      📊 After removing boring: ${nonBoring.length}/${maxScreenshots}`);
+        console.log(`      🔄 Adding ${maxScreenshots - nonBoring.length} more screenshots...`);
+        
+        // Find screenshots not selected yet and not boring
+        const selectedSteps = new Set(nonBoring.map((s: ScreenshotForFiltering) => s.stepNumber));
+        const candidates = uniqueScreenshots.filter(s => {
+          if (selectedSteps.has(s.stepNumber)) return false;
+          const desc = s.description.toLowerCase();
+          return !boringKeywords.some(keyword => desc.includes(keyword));
+        });
+
+        // Add best candidates (prioritize keywords)
+        const priorityKeywords = options.priorityKeywords || [];
+        candidates.sort((a, b) => {
+          const aScore = priorityKeywords.filter(k => 
+            a.description.toLowerCase().includes(k.toLowerCase())
+          ).length;
+          const bScore = priorityKeywords.filter(k => 
+            b.description.toLowerCase().includes(k.toLowerCase())
+          ).length;
+          return bScore - aScore;
+        });
+
+        const needed = maxScreenshots - nonBoring.length;
+        const additional = candidates.slice(0, needed);
+        filtered = [...nonBoring, ...additional];
+        
+        console.log(`      ✅ Added ${additional.length} additional screenshots`);
+        additional.forEach(s => {
+          console.log(`         + [Step ${s.stepNumber}] ${s.description}`);
+        });
+      } else {
+        filtered = nonBoring;
+      }
+      
+      console.log(`\n   ✅ Final Selection: ${filtered.length} screenshots`);
+      console.log(`   Original → Unique → Selected: ${screenshots.length} → ${uniqueScreenshots.length} → ${filtered.length}`);
+      console.log(`   Selected step numbers: ${filtered.map((s: ScreenshotForFiltering) => s.stepNumber || '?').join(', ')}`);
+      
+      return filtered;
+    } catch (error) {
+      console.error('❌ Error parsing AI response, falling back to smart selection:', error);
+      return this.fallbackScreenshotSelection(screenshots, maxScreenshots);
+    }
+  }
+
+  /**
+   * Fallback screenshot selection if AI filtering fails
+   * Uses simple heuristics to select diverse screenshots
+   */
+  private static fallbackScreenshotSelection(
+    screenshots: ScreenshotForFiltering[],
+    maxScreenshots: number
+  ): ScreenshotForFiltering[] {
+    console.log('🔄 Using fallback selection method...');
+    
+    // Remove obvious "boring" screenshots
+    const meaningful = screenshots.filter(s => {
+      const desc = s.description.toLowerCase();
+      return !desc.includes('waiting') && 
+             !desc.includes('loading') &&
+             !desc.includes('scrolling') &&
+             !desc.includes('observing');
+    });
+
+    // If we filtered too much, use original
+    const candidates = meaningful.length > 0 ? meaningful : screenshots;
+
+    // Always keep first and last
+    const result: ScreenshotForFiltering[] = [];
+    
+    if (candidates.length <= maxScreenshots) {
+      return candidates;
+    }
+
+    // Keep first
+    result.push(candidates[0]);
+
+    // Sample middle evenly
+    const middleCount = maxScreenshots - 2;
+    const step = Math.floor((candidates.length - 2) / middleCount);
+    
+    for (let i = 1; i < candidates.length - 1; i += step) {
+      if (result.length < maxScreenshots - 1) {
+        result.push(candidates[i]);
+      }
+    }
+
+    // Keep last
+    result.push(candidates[candidates.length - 1]);
+
+    return result;
+  }
+
+  /**
+   * Remove screenshots with exact duplicate descriptions
+   * Keeps the first occurrence of each unique description
+   */
+  private static removeDuplicateDescriptions(
+    screenshots: ScreenshotForFiltering[]
+  ): ScreenshotForFiltering[] {
+    const seen = new Set<string>();
+    const unique: ScreenshotForFiltering[] = [];
+
+    for (const screenshot of screenshots) {
+      const normalizedDesc = screenshot.description.toLowerCase().trim();
+      
+      if (!seen.has(normalizedDesc)) {
+        seen.add(normalizedDesc);
+        unique.push(screenshot);
+      }
+    }
+
+    return unique;
   }
 }
