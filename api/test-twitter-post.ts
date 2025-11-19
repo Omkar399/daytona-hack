@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * Simple test to post to Twitter/X with an image
- * Uses local browser automation with Claude Sonnet
+ * Uses local browser automation with NVIDIA's vision model
  */
 
 import { BrowserService } from './src/service/browser/Browser.service';
@@ -18,7 +18,7 @@ async function testTwitterPost() {
 
 This post was created by an AI agent using:
 ✅ Local browser automation
-✅ Claude Sonnet for control
+✅ NVIDIA Nemotron vision model for control
 ✅ Persistent login sessions
 ✅ Native file uploads
 
@@ -27,7 +27,8 @@ If you see this image, it worked! 🎉`;
   console.log('📋 Test Configuration:');
   console.log(`   Post length: ${postContent.length} characters`);
   console.log(`   Image URL: ${screenshotUrl}`);
-  console.log(`   Using: Local Browser (Python + Claude Sonnet)`);
+  console.log(`   Using: Local Browser (Python + NVIDIA Vision Model)`);
+  console.log(`   Model: nvidia/nemotron-nano-12b-v2-vl`);
   console.log(`   Profile: ~/.browser-use-x-profile`);
   console.log('═'.repeat(60));
   console.log('');
@@ -43,12 +44,12 @@ If you see this image, it worked! 🎉`;
     console.log('\n' + '═'.repeat(60));
     console.log('✅ POST COMPLETE!');
     console.log('═'.repeat(60));
-    console.log(`   Status: ${result.status}`);
-    console.log(`   Task ID: ${result.taskId || 'N/A'}`);
-    console.log(`   Screenshots captured: ${result.screenshots?.length || 0}`);
+    console.log(`   Status: ${(result as any).status}`);
+    console.log(`   Task ID: ${(result as any).taskId || 'N/A'}`);
+    console.log(`   Screenshots captured: ${(result as any).screenshots?.length || 0}`);
     
-    if (result.result) {
-      console.log(`   Result: ${result.result}`);
+    if ((result as any).result) {
+      console.log(`   Result: ${(result as any).result}`);
     }
     
     console.log('═'.repeat(60));
@@ -73,7 +74,7 @@ If you see this image, it worked! 🎉`;
     console.error('');
     console.error('💡 Troubleshooting:');
     console.error('   1. Check if you\'re logged into X: ./api/open-chrome-login.sh');
-    console.error('   2. Verify ANTHROPIC_API_KEY is set in .env');
+    console.error('   2. Verify NVIDIA_API_KEY is set in .env');
     console.error('   3. Ensure X_USERNAME and X_PASSWORD are set (for first login)');
     console.error('   4. Check Python venv is set up: ./api/setup-browser-local.sh');
     console.error('');

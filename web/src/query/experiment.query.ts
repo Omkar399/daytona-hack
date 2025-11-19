@@ -47,6 +47,9 @@ export const useExperimentsQuery = () => {
         method: 'GET',
       });
     },
+    // Auto-refetch every 5 seconds to get latest experiment statuses
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true, // Continue polling even when tab is not focused
   });
 
   return {
@@ -72,6 +75,17 @@ export const useExperimentDetailQuery = (experimentId: string | null) => {
       return experimentResponse[0] || experimentResponse;
     },
     enabled: !!experimentId,
+    // Auto-refetch every 3 seconds while status is not 'completed' or 'failed'
+    refetchInterval: (query) => {
+      const data = query.state.data as Experiment | undefined;
+      // Stop polling if completed or failed
+      if (data?.status === 'completed' || data?.status === 'failed') {
+        return false;
+      }
+      // Poll every 3 seconds while running or pending
+      return 3000;
+    },
+    refetchIntervalInBackground: true, // Continue polling even when tab is not focused
   });
 
   return {

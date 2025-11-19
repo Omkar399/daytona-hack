@@ -1,11 +1,12 @@
 export async function register() {
-  if (process.env.NEXT_RUNTIME === "nodejs") {
-    await import("./sentry.server.config");
-  }
-
-  if (process.env.NEXT_RUNTIME === "edge") {
-    await import("./sentry.edge.config");
-  }
+  // Sentry disabled for now
+  // if (process.env.NEXT_RUNTIME === "nodejs") {
+  //   await import("./sentry.server.config");
+  // }
+  //
+  // if (process.env.NEXT_RUNTIME === "edge") {
+  //   await import("./sentry.edge.config");
+  // }
 }
 
 export const onRequestError = async (
@@ -27,16 +28,17 @@ export const onRequestError = async (
     renderType: "dynamic" | "dynamic-resume"; // "dynamic-resume" for PPR
   }
 ) => {
-  const Sentry = await import("@sentry/nextjs");
-
-  Sentry.captureException(err, (scope) => {
-    scope.setContext("nextjs", context);
-    scope.setContext("request", {
-      path: request.path,
-      method: request.method,
-      headers: request.headers,
-    });
-    return scope;
-  });
+  // Sentry disabled for now
+  // const Sentry = await import("@sentry/nextjs");
+  //
+  // Sentry.captureException(err, (scope) => {
+  //   scope.setContext("nextjs", context);
+  //   scope.setContext("request", {
+  //     path: request.path,
+  //     method: request.method,
+  //     headers: request.headers,
+  //   });
+  //   return scope;
+  // });
 };
 

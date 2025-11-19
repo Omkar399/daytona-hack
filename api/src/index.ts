@@ -3,10 +3,11 @@ import { Elysia } from 'elysia';
 import { logger } from '@bogeychan/elysia-logger';
 import { inngestHandler } from '@/lib/inngest';
 import cors from '@elysiajs/cors';
-import { initializeSentry, Sentry } from '@/lib/sentry';
+// import { initializeSentry, Sentry } from '@/lib/sentry';
 
 // Initialize Sentry as early as possible
-initializeSentry();
+// Sentry disabled for now
+// initializeSentry();
 
 const port = 8000;
 
@@ -23,21 +24,22 @@ const app = new Elysia()
   )
   // Global error handler - capture all errors in Sentry
   .onError(({ error, code, set, request }) => {
+    // Sentry disabled for now
     // Capture the error in Sentry with context
-    Sentry.captureException(error, {
-      tags: {
-        errorCode: code,
-        path: new URL(request.url).pathname,
-        method: request.method,
-      },
-      contexts: {
-        request: {
-          url: request.url,
-          method: request.method,
-          headers: Object.fromEntries(request.headers.entries()),
-        },
-      },
-    });
+    // Sentry.captureException(error, {
+    //   tags: {
+    //     errorCode: code,
+    //     path: new URL(request.url).pathname,
+    //     method: request.method,
+    //   },
+    //   contexts: {
+    //     request: {
+    //       url: request.url,
+    //       method: request.method,
+    //       headers: Object.fromEntries(request.headers.entries()),
+    //     },
+    //   },
+    // });
 
     console.error('❌ Error:', error);
     
@@ -46,7 +48,7 @@ const app = new Elysia()
     
     return {
       error: code === 'NOT_FOUND' ? 'Not Found' : 'Internal Server Error',
-      message: error.message,
+      message: String((error as any)?.message || 'Unknown error'),
       code,
     };
   })

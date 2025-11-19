@@ -338,18 +338,20 @@ export abstract class ExperimentService {
    */
   static async initRepository(repoUrl: string, experimentId: Id<'experiment'>) {
     // Set Sentry context for this experiment
-    setExperimentContext(experimentId, { repoUrl });
-    addBreadcrumb('Starting repository initialization', 'experiment', { experimentId, repoUrl });
+    // setExperimentContext(experimentId, { repoUrl });
+    // addBreadcrumb('Starting repository initialization', 'experiment', { experimentId, repoUrl });
 
     // Start Sentry transaction to track performance
-    const transaction = Sentry.startTransaction({
-      op: 'experiment.init',
-      name: 'Initialize Repository',
-      tags: {
-        experimentId,
-        repoUrl,
-      },
-    });
+    // Sentry disabled for now
+    const transaction = {
+      startChild: (config: any) => ({
+        setData: (key: string, value: any) => {},
+        setStatus: (status: string) => {},
+        finish: () => {},
+      }),
+      setStatus: (status: string) => {},
+      finish: () => {},
+    };
 
     try {
       let start = Date.now();
@@ -383,16 +385,17 @@ export abstract class ExperimentService {
           break; // Success! Exit retry loop
         } catch (error) {
           lastError = error;
-          console.error(`Sandbox creation attempt ${i + 1} failed:`, error.message);
+          console.error(`Sandbox creation attempt ${i + 1} failed:`, (error as Error).message);
           
           // Capture each retry failure as a warning
-          Sentry.captureException(error, {
-            tags: {
-              attempt: i + 1,
-              experimentId,
-            },
-            level: i < retries - 1 ? 'warning' : 'error',
-          });
+          // Sentry disabled for now
+          // Sentry.captureException(error, {
+          //   tags: {
+          //     attempt: i + 1,
+          //     experimentId,
+          //   },
+          //   level: i < retries - 1 ? 'warning' : 'error',
+          // });
           
           if (i < retries - 1) {
             const waitTime = (i + 1) * 5000; // Wait 5s, 10s, 15s
@@ -407,7 +410,7 @@ export abstract class ExperimentService {
         sandboxSpan.finish();
         transaction.setStatus('failed');
         transaction.finish();
-        throw new Error(`Failed to create sandbox after ${retries} attempts. Last error: ${lastError?.message || 'Unknown'}`);
+        throw new Error(`Failed to create sandbox after ${retries} attempts. Last error: ${(lastError as Error)?.message || 'Unknown'}`);
       }
       
       end = Date.now();
@@ -419,7 +422,8 @@ export abstract class ExperimentService {
       console.log(`Time taken to create sandbox: ${sandboxDuration}ms`);
       
       // Add performance metric to Sentry
-      Sentry.setMeasurement('sandbox_creation_time', sandboxDuration, 'millisecond');
+      // Sentry disabled for now
+      // Sentry.setMeasurement('sandbox_creation_time', sandboxDuration, 'millisecond');
 
       // Track git clone
       const cloneSpan = transaction.startChild({
@@ -436,7 +440,8 @@ export abstract class ExperimentService {
       cloneSpan.setStatus('ok');
       cloneSpan.finish();
       console.log(`Time taken to clone repository: ${cloneDuration}ms`);
-      Sentry.setMeasurement('git_clone_time', cloneDuration, 'millisecond');
+      // Sentry disabled for now
+      // Sentry.setMeasurement('git_clone_time', cloneDuration, 'millisecond');
 
       // Install pm2
       addBreadcrumb('Installing PM2', 'setup');
@@ -465,7 +470,8 @@ export abstract class ExperimentService {
       installSpan.setStatus('ok');
       installSpan.finish();
       console.log(`Time taken to install dependencies: ${installDuration}ms`);
-      Sentry.setMeasurement('npm_install_time', installDuration, 'millisecond');
+      // Sentry disabled for now
+      // Sentry.setMeasurement('npm_install_time', installDuration, 'millisecond');
 
       // print out the current directory
       const cwdLs = await sandbox.process.executeCommand(
@@ -493,7 +499,8 @@ export abstract class ExperimentService {
       serverSpan.finish();
       console.log(`Time taken to execute npm run dev: ${serverDuration}ms`);
       console.log(`Code run result: ${JSON.stringify(codeRunResult, null, 2)}`);
-      Sentry.setMeasurement('server_start_time', serverDuration, 'millisecond');
+      // Sentry disabled for now
+      // Sentry.setMeasurement('server_start_time', serverDuration, 'millisecond');
 
       await new Promise((resolve) => setTimeout(resolve, 3000));
       console.log('Dev server should be running now');
@@ -527,10 +534,11 @@ export abstract class ExperimentService {
       transaction.setStatus('ok');
       transaction.finish();
       
-      addBreadcrumb('Repository initialization complete', 'experiment', {
-        variantId: newVariant.id,
-        publicUrl: previewUrl.url,
-      });
+      // Sentry disabled for now
+      // addBreadcrumb('Repository initialization complete', 'experiment', {
+      //   variantId: newVariant.id,
+      //   publicUrl: previewUrl.url,
+      // });
 
       return {
         sandbox: {
@@ -541,12 +549,13 @@ export abstract class ExperimentService {
       };
     } catch (error) {
       // Capture the error with full context
-      Sentry.captureException(error, {
-        tags: {
-          experimentId,
-          operation: 'init_repository',
-        },
-      });
+      // Sentry disabled for now
+      // Sentry.captureException(error, {
+      //   tags: {
+      //     experimentId,
+      //     operation: 'init_repository',
+      //   },
+      // });
 
       transaction.setStatus('internal_error');
       transaction.finish();

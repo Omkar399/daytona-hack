@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any
 import tempfile
 import requests
-from browser_use import Agent, Browser, ChatAnthropic
+from browser_use import Agent, Browser, ChatOpenAI
 
 # Try to load .env file if python-dotenv is available (for direct execution)
 try:
@@ -31,9 +31,14 @@ class BrowserLocalService:
     """Local browser automation service with file upload support"""
     
     def __init__(self):
-        self.api_key = os.getenv("ANTHROPIC_API_KEY")
+        # Use NVIDIA's Llama model via OpenAI-compatible API
+        self.api_key = os.getenv("NVIDIA_API_KEY")
         if not self.api_key:
-            raise ValueError("ANTHROPIC_API_KEY environment variable is required")
+            raise ValueError("NVIDIA_API_KEY environment variable is required")
+        
+        # NVIDIA's API is OpenAI-compatible, use it with ChatOpenAI
+        self.base_url = "https://integrate.api.nvidia.com/v1"
+        self.model = "meta/llama-4-maverick-17b-128e-instruct"
         
         # Create downloads directory for temporary files
         self.downloads_dir = Path(tempfile.gettempdir()) / "browser-use-downloads"
@@ -143,14 +148,15 @@ If you're just observing, use action: {"name": "done", "params": {}}.
         
         agent = Agent(
             task=task_prompt,
-            llm=ChatAnthropic(
-                model="claude-sonnet-4-5-20250929",  # Claude Haiku 4.5 - Fast and cheap
+            llm=ChatOpenAI(
+                model=self.model,
                 api_key=self.api_key,
+                base_url=self.base_url,
                 temperature=0.0,  # Deterministic for automation
             ),
             browser=browser,
+            use_vision=False,  # Llama is text-based, not vision-enabled
             available_file_paths=image_paths,  # Allow agent to access downloaded images
-            extend_system_message=strict_format_prompt,  # Add strict JSON formatting rules
         )
         
         print("🚀 Starting browser automation task...")
@@ -229,36 +235,81 @@ If you're just observing, use action: {"name": "done", "params": {}}.
         # Image upload steps (adjust step number based on login flow)
         step_num = 6 if skip_login else 7  # Skip login: steps 1-5, then 6+ | Login: steps 1-6, then 7+
         if image_paths:
+            file_paths_str = ', '.join(f'"{path}"' for path in image_paths)
             prompt += f"""
 
-{step_num}. CRITICAL: Attach images as FILES. Twitter/X requires actual image files to be uploaded.
+{step_num}. ATTACH {len(image_paths)} IMAGE(S) DIRECTLY (without clicking media button):
 
-   You have {len(image_paths)} image(s) to attach. Follow these steps:
+   Image file paths to upload:
+{chr(10).join(f'   - {path}' for path in image_paths)}
    
-   Step A: Click the image/media attachment button (usually an image icon, "+" button, or media icon near the post text box)
+   STEPS:
    
-   Step B: Upload each image file using the file picker:
+   Step A: Use execute_javascript to find the hidden file input element and inject files directly:
    
-   For each image:
-   {chr(10).join(f'   - {path}  # Image {i+1}' for i, path in enumerate(image_paths))}
+   ```javascript
+   // Find all file input elements on the page
+   const fileInputs = document.querySelectorAll('input[type="file"]');
+   let fileInput = null;
    
-   IMPORTANT: 
-   - Click the media/image button to open the file picker
-   - When the file dialog appears, select and upload each image file above
-   - The Agent will automatically handle the file upload dialog
+   // Find the one that's likely for media upload (usually first or in the composer area)
+   for (let input of fileInputs) {{
+     if (input.style.display !== 'none' || input.offsetWidth > 0 || input.offsetHeight > 0) {{
+       fileInput = input;
+       break;
+     }}
+   }}
    
-   Step C: Wait 5-10 seconds after uploading to allow Twitter/X to process and display previews
-   Step D: VERIFY {len(image_paths)} image preview(s) appear in the composer before posting
-   Step E: If previews are visible, proceed to post. If not, try clicking media button again and re-uploading"""
+   // If not found, try the first one (usually hidden but functional)
+   if (!fileInput && fileInputs.length > 0) {{
+     fileInput = fileInputs[0];
+   }}
+   
+   if (fileInput) {{
+     console.log('Found file input:', fileInput);
+     // Make it visible temporarily if needed
+     fileInput.style.display = 'block';
+     fileInput.style.visibility = 'visible';
+     fileInput.style.position = 'fixed';
+     fileInput.style.top = '0';
+     fileInput.style.left = '0';
+     fileInput.style.zIndex = '9999';
+   }} else {{
+     console.error('File input not found');
+   }}
+   ```
+   
+   Step B: After finding the file input, use the 'upload_file' action with the file paths:
+   - Use upload_file action to inject: {file_paths_str}
+   
+   Step C: Wait 5-10 seconds for X to process and display the image preview
+   
+   Step D: VERIFY {len(image_paths)} image preview(s) appear in the composer
+   
+   Step E: If images are visible, proceed to post. If not, try clicking the media button and retry."""
             step_num += 1
         
         prompt += f"""
-{step_num}. ONLY click "Post" if you can VERIFY all images are visible in the composer (or if no images, just verify the text is correct)
-{step_num + 1}. If everything looks good, click the "Post" or "Tweet" button ONCE
-{step_num + 2}. Wait for the post to appear in the feed
-{step_num + 3}. STOP - Your task is complete. Do NOT make another post.
+{step_num}. VERIFY THE POST WAS CREATED:
 
-IMPORTANT: Make only ONE post and then stop. Do not repeat the posting action."""
+   Step A: Navigate to your profile page to verify the post was created
+   - Click on your profile icon/avatar (top right of the page)
+   - Or go to: https://x.com/your_username
+   - Look for the recent post with the message: "🚀 Testing automated Twitter posting with Browser Use!"
+   
+   Step B: Confirm the post details:
+   - Verify the text content is correct
+   - Verify the image is attached and visible
+   - Check that the post timestamp is recent
+   
+   Step C: If post is visible on profile: SUCCESS - Task complete
+   
+   Step D: If post is NOT visible: 
+   - Go back to home feed and check again
+   - It may take a few seconds to appear
+   - Refresh the page if needed
+
+IMPORTANT: Do NOT make another post. Your task is complete once you verify the post exists."""
         
         return prompt
     
